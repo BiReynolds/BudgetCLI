@@ -1,10 +1,8 @@
-using BudgetCLI.Scanner;
-
-namespace BudgetCLI.Evaluator
+namespace BudgetCLI.Core.Objects
 {
     public abstract class OutputTokenBase
     {
-        readonly OutputTokenEnum OutputTokenType;
+        public readonly OutputTokenEnum OutputTokenType;
         public OutputTokenBase(OutputTokenEnum outputTokenType)
         {
             OutputTokenType = outputTokenType;

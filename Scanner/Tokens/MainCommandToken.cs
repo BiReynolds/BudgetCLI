@@ -1,3 +1,5 @@
+using BudgetCLI.Core.Objects;
+
 namespace BudgetCLI.Scanner.Tokens
 {
     public class MainCommandToken : BudgetTokenBase

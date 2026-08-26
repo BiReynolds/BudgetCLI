@@ -1,8 +1,11 @@
+using BudgetCLI.Core.Interfaces;
+using BudgetCLI.Core.Objects;
+using BudgetCLI.Exceptions;
 using BudgetCLI.Scanner.Tokens;
 
 namespace BudgetCLI.Scanner
 {
-    public class BasicCommandScanner
+    public class BasicCommandScanner : IScanner
     {
         static Dictionary<string, BudgetMainCommandEnum> StringToCommandDict = new()
         {
@@ -55,7 +58,7 @@ namespace BudgetCLI.Scanner
             }
             if (result == null)
             {
-                throw new Exception($"Could not get token from word {word}");
+                throw new CannotGetTokenFromWordException(word);
             }
             else
             {
@@ -66,7 +69,7 @@ namespace BudgetCLI.Scanner
         public string ReadToNextWhiteSpace()
         {
             string result = RawString[CurrentIndex - 1].ToString(); // start of word was the last read character
-            while (!char.IsWhiteSpace(PeekChar()))
+            while (CurrentIndex < RawString.Length && !char.IsWhiteSpace(PeekChar()))
             {
                 result += ReadChar();
             }

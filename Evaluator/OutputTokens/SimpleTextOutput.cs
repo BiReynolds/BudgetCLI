@@ -1,4 +1,4 @@
-using BudgetCLI.Scanner;
+using BudgetCLI.Core.Objects;
 
 namespace BudgetCLI.Evaluator.OutputTokens
 {

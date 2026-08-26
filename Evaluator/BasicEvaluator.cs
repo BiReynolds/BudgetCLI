@@ -1,29 +1,31 @@
-using BudgetCLI.Evaluator.OutputTokens;
-using BudgetCLI.Scanner;
+using BudgetCLI.Core.Objects;
+using BudgetCLI.Core.Interfaces;
 using BudgetCLI.Scanner.Tokens;
+using BudgetCLI.Evaluator.OutputTokens;
+using BudgetCLI.Exceptions;
 
-namespace BudgetCLI.Evaluator
+namespace BudgetCLI.Evaluator 
 {
-    public class BasicEvaluator
+    public class BasicEvaluator : IEvaluator
     {
         public OutputTokenBase Evaluate(List<BudgetTokenBase> tokens)
         {
             BudgetTokenBase firstToken = tokens[0];
             if (firstToken.TokenType != BudgetTokenEnum.MAIN_COMMAND)
             {
-                throw new Exception($"input should begin with a recognized command, instead received token {firstToken.RawToken} of type {firstToken.TokenType}");
+                throw new NoLeadingCommandException(firstToken);
             }
             MainCommandToken? commandToken = firstToken as MainCommandToken;
             if (commandToken == null)
             {
-                throw new Exception($"Budget Token has TokenType of MAIN_COMMAND but could not be parsed as MainCommandToken");
+                throw new TokenTypeMismatchException(BudgetTokenEnum.MAIN_COMMAND, typeof(MainCommandToken));
             }
             switch (commandToken.CommandType)
             {
                 case BudgetMainCommandEnum.SHOW:
                     return EvaluateShowCommand(tokens[1..]);
                 default:
-                    throw new Exception($"BasicEvaluator does not support command {commandToken.CommandType}");
+                    throw new CommandNotSupportedException(commandToken);
             }
         }
 

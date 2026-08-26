@@ -1,4 +1,4 @@
-namespace BudgetCLI.Scanner
+namespace BudgetCLI.Core.Objects
 {
     public class BudgetTokenBase
     {
