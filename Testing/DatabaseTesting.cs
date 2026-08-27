@@ -8,7 +8,7 @@ namespace BudgetCLI.Testing
     {
         public static void OneTimeBillTest()
         {
-            OneTimeBillModel testBill = new("OneTimeBillTest testBill", DateOnly.FromDateTime(DateTime.Today), false);
+            OneTimeBillModel testBill = new("OneTimeBillTest testBill", 100.00m, DateOnly.FromDateTime(DateTime.Today), false);
             SqliteConnection connection = DatabaseHelper.GetReadWriteConnection();
             connection.Open();
             SqliteTransaction transaction = connection.BeginTransaction();

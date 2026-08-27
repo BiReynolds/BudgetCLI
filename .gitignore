@@ -290,3 +290,4 @@ __pycache__/
 
 # Ignore any db files, as those should be generated locally and we don't want development data to be included in a build
 *.db
+*.db-journal

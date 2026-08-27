@@ -25,10 +25,11 @@ namespace BudgetCLI.Data
         {
             SqliteCommand command = connection.CreateCommand();
             command.CommandText = """
-                INSERT INTO OneTimeBills (Name, DueDate, IsPaid)
-                VALUES ($name, $dueDate, $isPaid);
+                INSERT INTO OneTimeBills (Name, Amount, DueDate, IsPaid)
+                VALUES ($name, $amount, $dueDate, $isPaid);
             """;
             command.Parameters.AddWithValue("$name", newBill.Name);
+            command.Parameters.AddWithValue("$amount", newBill.Amount);
             command.Parameters.AddWithValue("$dueDate", newBill.DueDate);
             command.Parameters.AddWithValue("$isPaid", newBill.IsPaid);
             command.ExecuteNonQuery();
@@ -48,8 +49,9 @@ namespace BudgetCLI.Data
                 return new OneTimeBillModel(
                     reader.GetInt16(0),
                     reader.GetString(1),
-                    DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    reader.GetBoolean(3)
+                    reader.GetDecimal(2),
+                    DateOnly.FromDateTime(reader.GetDateTime(3)),
+                    reader.GetBoolean(4)
                 );
             }
             else
@@ -72,8 +74,9 @@ namespace BudgetCLI.Data
                 return new OneTimeBillModel(
                     reader.GetInt16(0),
                     reader.GetString(1),
-                    DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    reader.GetBoolean(3)
+                    reader.GetDecimal(2),
+                    DateOnly.FromDateTime(reader.GetDateTime(3)),
+                    reader.GetBoolean(4)
                 );
             }
             else
