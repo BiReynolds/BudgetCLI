@@ -4,7 +4,7 @@
 ## In Progress
 ### Minimal Functionality
 - Add One-Time Bill
-    - [ ] Syntax: `add bill [name] [amount] [dueDate]`
+    - [x] Syntax: `add bill '[name]' [amount] [dueDate]`
 - Delete One-Time Bill by Name
     - [ ] Syntax: `delete bill [id]`
 - Pull specific bill info

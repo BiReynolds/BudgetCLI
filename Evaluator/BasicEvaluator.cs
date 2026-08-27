@@ -69,6 +69,10 @@ namespace BudgetCLI.Evaluator
 
         void GetAddBillArgs(List<BudgetTokenBase> remainingTokens, out string name, out decimal amount, out DateOnly dueDate)
         {
+            if (remainingTokens.Count != 3)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 3);
+            }
             if (remainingTokens[0].TokenType != BudgetTokenEnum.STRING)
             {
                 throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
@@ -88,7 +92,45 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateDeleteCommand(List<BudgetTokenBase> remainingTokens)
         {
-            throw new NotImplementedException();
+            Connection.Open();
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            {
+                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
+                switch (subCommandToken.SubCommandType)
+                {
+                    case SubCommandEnum.BILL:
+                        GetDeleteBillArgs(remainingTokens[1..], out int billId);
+                        bool didDelete = DatabaseHelper.DeleteOneTimeBillById(billId, Connection);
+                        if (didDelete)
+                        {
+                            return new SimpleTextOutput($"bill with id {billId} deleted");
+                        }
+                        else 
+                        {
+                            return new SimpleTextOutput($"no change made - no bill found with id {billId}");
+                        }
+                    default:
+                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.DELETE, subCommandToken.SubCommandType);
+                }
+            }
+            else
+            {
+                Connection.Close();
+                throw new ExpectedSubCommandException(BudgetMainCommandEnum.ADD);
+            }
+        }
+
+        void GetDeleteBillArgs(List<BudgetTokenBase> remainingTokens, out int billId)
+        {
+            if (remainingTokens.Count != 1)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count - 1, 1);
+            }
+            if (remainingTokens[0].TokenType != BudgetTokenEnum.NUMBER)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
+            }
+            billId = (int)((NumberToken)remainingTokens[0]).Value;
         }
     }
 }
