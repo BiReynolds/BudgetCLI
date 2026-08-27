@@ -13,6 +13,9 @@ namespace BudgetCLI.Scanner.Tokens
 
     public enum BudgetMainCommandEnum
     {
-        SHOW
+        SHOW,
+        ADD,
+        DELETE
     }
+
 }

@@ -9,5 +9,10 @@ namespace BudgetCLI.Evaluator.OutputTokens
         {
             Content = string.Join(' ', tokensToShow);
         }
+
+        public SimpleTextOutput(string content) : base(OutputTokenEnum.SIMPLE_TEXT)
+        {
+            Content = content;
+        }
     }
 }

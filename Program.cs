@@ -18,8 +18,8 @@ namespace BudgetCLI
         public static void Main()
         {
             MigrationManager.DoMigrations();
-            RunTests();
             BudgetEngine engine = new(Scanner, Evaluator, Renderer);
+            engine.Start();
         }
 
         public static void RunTests()

@@ -15,6 +15,8 @@ namespace BudgetCLI.Core.Objects
     {
         NUMBER,
         STRING,
-        MAIN_COMMAND
+        DATE,
+        MAIN_COMMAND,
+        SUB_COMMAND
     }
 }

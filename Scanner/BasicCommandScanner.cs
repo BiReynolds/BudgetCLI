@@ -7,10 +7,6 @@ namespace BudgetCLI.Scanner
 {
     public class BasicCommandScanner : IScanner
     {
-        static Dictionary<string, BudgetMainCommandEnum> StringToCommandDict = new()
-        {
-            {"show", BudgetMainCommandEnum.SHOW}
-        };
         string RawString = "";
         int CurrentIndex = 0;
         List<BudgetTokenBase> OutputTokens = [];
@@ -52,10 +48,20 @@ namespace BudgetCLI.Scanner
             {
                 result = stringResult;
             }
-            else if (StringToCommandDict.TryGetValue(word, out BudgetMainCommandEnum value))
+            else if (TokenHelper.TryGetDateToken(word, out DateToken? dateResult))
             {
-                result = new MainCommandToken(word, value);
+                result = dateResult;
             }
+            else if (TokenHelper.TryGetSubCommand(word, out SubCommandEnum? subCommandType))
+            {
+                result = new SubCommandToken(word, (SubCommandEnum)subCommandType);
+            }
+            else if (TokenHelper.TryGetCommandType(word, out BudgetMainCommandEnum? mainCommandType))
+            {
+                result = new MainCommandToken(word, (BudgetMainCommandEnum)mainCommandType);
+            }
+            
+
             if (result == null)
             {
                 throw new CannotGetTokenFromWordException(word);

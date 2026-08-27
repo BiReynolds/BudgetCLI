@@ -3,11 +3,15 @@ using BudgetCLI.Core.Interfaces;
 using BudgetCLI.Scanner.Tokens;
 using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
+using BudgetCLI.Data;
+using BudgetCLI.Data.Models;
+using Microsoft.Data.Sqlite;
 
 namespace BudgetCLI.Evaluator 
 {
     public class BasicEvaluator : IEvaluator
     {
+        SqliteConnection Connection = DatabaseHelper.GetReadWriteConnection();
         public OutputTokenBase Evaluate(List<BudgetTokenBase> tokens)
         {
             BudgetTokenBase firstToken = tokens[0];
@@ -15,8 +19,7 @@ namespace BudgetCLI.Evaluator
             {
                 throw new NoLeadingCommandException(firstToken);
             }
-            MainCommandToken? commandToken = firstToken as MainCommandToken;
-            if (commandToken == null)
+            if (firstToken is not MainCommandToken commandToken)
             {
                 throw new TokenTypeMismatchException(BudgetTokenEnum.MAIN_COMMAND, typeof(MainCommandToken));
             }
@@ -24,6 +27,10 @@ namespace BudgetCLI.Evaluator
             {
                 case BudgetMainCommandEnum.SHOW:
                     return EvaluateShowCommand(tokens[1..]);
+                case BudgetMainCommandEnum.ADD:
+                    return EvaluateAddCommand(tokens[1..]);
+                case BudgetMainCommandEnum.DELETE:
+                    return EvaluateDeleteCommand(tokens[1..]);
                 default:
                     throw new CommandNotSupportedException(commandToken);
             }
@@ -32,6 +39,56 @@ namespace BudgetCLI.Evaluator
         OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens)
         {
             return new SimpleTextOutput(remainingTokens);
+        }
+
+        OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            Connection.Open();
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            {
+                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
+                switch (subCommandToken.SubCommandType)
+                {
+                    case SubCommandEnum.BILL:
+                        GetAddBillArgs(remainingTokens[1..], out string name, out decimal amount, out DateOnly dueDate);
+                        OneTimeBillModel model = new(name, amount, dueDate, false);
+                        DatabaseHelper.AddOneTimeBillToDatabase(model, Connection);
+                        Connection.Close();
+                        return new SimpleTextOutput($"Bill {name} added to database");
+                    default:
+                        Connection.Close();
+                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.ADD, subCommandToken.SubCommandType);
+                }
+            }
+            else
+            {
+                Connection.Close();
+                throw new ExpectedSubCommandException(BudgetMainCommandEnum.ADD);
+            }
+        }
+
+        void GetAddBillArgs(List<BudgetTokenBase> remainingTokens, out string name, out decimal amount, out DateOnly dueDate)
+        {
+            if (remainingTokens[0].TokenType != BudgetTokenEnum.STRING)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
+            }
+            if (remainingTokens[1].TokenType != BudgetTokenEnum.NUMBER)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
+            }
+            if (remainingTokens[2].TokenType != BudgetTokenEnum.DATE)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[2], BudgetTokenEnum.DATE);
+            }
+            name = ((StringToken)remainingTokens[0]).Value;
+            amount = ((NumberToken)remainingTokens[1]).Value;
+            dueDate = ((DateToken)remainingTokens[2]).Value;
+        }
+
+        OutputTokenBase EvaluateDeleteCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            throw new NotImplementedException();
         }
     }
 }

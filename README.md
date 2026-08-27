@@ -4,11 +4,18 @@
 ## In Progress
 ### Minimal Functionality
 - Add One-Time Bill
-  - Syntax: `add bill [name] [amount]`
+    - [ ] Syntax: `add bill [name] [amount] [dueDate]`
 - Delete One-Time Bill by Name
+    - [ ] Syntax: `delete bill [id]`
+- Pull specific bill info
+    - [ ] Syntax: `show bill [id]`
 - Pull List of One-Time Bills
+    - [ ] Syntax: `show bills`
 
 ## Upcoming
+### Minimal Functionality
+- Mark bill paid
+- Edit existing bill
 ### Basic Functionality
 - Add Recurring Bill (and corresponding one-time instances)
 - Delete Recurring Bill (and all one-time instances)
