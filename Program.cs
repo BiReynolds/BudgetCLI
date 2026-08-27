@@ -5,6 +5,7 @@ using BudgetCLI.Renderer;
 using BudgetCLI.Scanner;
 using BudgetCLI.Data;
 using BudgetCLI.Data.Models;
+using BudgetCLI.Testing;
 
 namespace BudgetCLI
 {
@@ -17,8 +18,13 @@ namespace BudgetCLI
         public static void Main()
         {
             MigrationManager.DoMigrations();
+            RunTests();
             BudgetEngine engine = new(Scanner, Evaluator, Renderer);
-            engine.Start();
+        }
+
+        public static void RunTests()
+        {
+            DatabaseTesting.OneTimeBillTest();
         }
     }
 }

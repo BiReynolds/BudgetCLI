@@ -3,12 +3,12 @@
 
 ## In Progress
 - Create Data Module
-    - [ ] Models - Create AppInfoModel
-    - [ ] Migration Manager - Create database on first open, including AppInfo table
-    - [ ] Data Manager - Create class which can read/write from AppInfo table 
-    - [ ] Models - Create OneTimeBill Model
-    - [ ] Migration Manager - Create OneTimeBills table
-    - [ ] Data Manager - Create class which can read/write from DataManager table
+    - [x] Models - Create AppInfoModel
+    - [x] Migration Manager - Create database on first open, including AppInfo table
+    - [x] Migration Manager - Run necessary migrations every time app is opened
+    - [x] Models - Create OneTimeBill Model
+    - [x] Migration Manager - Create OneTimeBills table
+    - [x] Data Manager - Create methods which can read/write from OneTimeBill table
 ## Upcoming
 ### Minimal Functionality
 - Add One-Time Bill

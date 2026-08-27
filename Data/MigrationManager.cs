@@ -6,6 +6,10 @@ namespace BudgetCLI.Data
     public class MigrationManager
     {
         static string MigrationScriptsPath = "./Data/MigrationScripts/";
+        static OrderedDictionary<string, string> DBVersionStringToMigrationScript = new()
+        {
+            {"0.1", "CreateOneTimeBillsTable.sql"}
+        };
         SqliteConnection Connection;
         AppInfoModel AppInfo = new();
         public MigrationManager()
@@ -14,18 +18,21 @@ namespace BudgetCLI.Data
             Connection = DatabaseHelper.GetReadWriteConnection();
         }
 
-        public void DoMigrations()
+        public void DoMigrations(string? targetVersion = null)
         {
             DatabaseHelper.EnsureDatabaseExists();
+            Connection.Open();
             if (!IsDatabaseInitialized())
             {
-                InitializeDatabase();
+                ReadAndRunSqlScript("BudgetDatabaseCreation.sql");
             }
+            GetAppInfo();
+            Migrate();
+            Connection.Close();
         }
 
-        public bool IsDatabaseInitialized()
+        bool IsDatabaseInitialized()
         {
-            Connection.Open();
             bool result;
             try
             {
@@ -45,17 +52,52 @@ namespace BudgetCLI.Data
             {
                 result = false;
             }
-            Connection.Close();
             return result;
         }
 
-        void InitializeDatabase()
+        void GetAppInfo()
         {
-            Connection.Open();
             SqliteCommand command = Connection.CreateCommand();
-            command.CommandText = File.ReadAllText(Path.Join(MigrationScriptsPath, "BudgetDatabaseCreation.sql"));
+            command.CommandText = "SELECT * FROM AppInfo";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                switch (reader.GetString(0))
+                {
+                    case "AppVersion":
+                        AppInfo.AppVersion = reader.GetString(1);
+                        break;
+                    case "DatabaseVersion":
+                        AppInfo.DatabaseVersion = reader.GetString(1);
+                        break;
+                    case "LastUpdate":
+                        AppInfo.LastUpdate = DateOnly.FromDateTime(reader.GetDateTime(1));
+                        break;
+                    case "LastOpened":
+                        AppInfo.LastOpened = DateOnly.FromDateTime(reader.GetDateTime(1));
+                        break;
+                }
+            }
+        }
+
+        void Migrate()
+        {
+            foreach (string dbVersionString in DBVersionStringToMigrationScript.Keys)
+            {
+                if (string.Compare(AppInfo.DatabaseVersion, dbVersionString) < 0)
+                {
+                    ReadAndRunSqlScript(DBVersionStringToMigrationScript[dbVersionString]);
+                    AppInfo.DatabaseVersion = dbVersionString;
+                }
+            }
+        }
+
+        void ReadAndRunSqlScript(string scriptFile)
+        {
+            string fullPath = Path.Join(MigrationScriptsPath, scriptFile);
+            SqliteCommand command = Connection.CreateCommand();
+            command.CommandText = File.ReadAllText(fullPath);
             command.ExecuteNonQuery();
-            Connection.Close();
         }
     }
 }
