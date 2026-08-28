@@ -18,7 +18,7 @@ namespace BudgetCLI.Data
             Connection = DatabaseHelper.GetReadWriteConnection();
         }
 
-        public void DoMigrations(string? targetVersion = null)
+        public void DoMigrations()
         {
             DatabaseHelper.EnsureDatabaseExists();
             Connection.Open();

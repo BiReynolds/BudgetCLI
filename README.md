@@ -6,9 +6,9 @@
 - Add One-Time Bill
     - [x] Syntax: `add bill '[name]' [amount] [dueDate]`
 - Delete One-Time Bill by Name
-    - [ ] Syntax: `delete bill [id]`
+    - [x] Syntax: `delete bill [id]`
 - Pull specific bill info
-    - [ ] Syntax: `show bill [id]`
+    - [x] Syntax: `show bill [id]`
 - Pull List of One-Time Bills
     - [ ] Syntax: `show bills`
 

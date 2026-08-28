@@ -38,7 +38,47 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens)
         {
-            return new SimpleTextOutput(remainingTokens);
+            Connection.Open();
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            {
+                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
+                switch (subCommandToken.SubCommandType)
+                {
+                    case SubCommandEnum.BILL:
+                        GetShowBillArgs(remainingTokens[1..], out int billId);
+                        OneTimeBillModel? model = DatabaseHelper.GetOneTimeBillById(billId, Connection);
+                        if (model == null)
+                        {
+                            Connection.Close();
+                            return new ErrorTextOutput($"No bill in db with id = {billId}");
+                        }
+                        else
+                        {
+                            Connection.Close();
+                            return new SingleOneTimeBillModelDetail(model);
+                        }
+                    default:
+                        Connection.Close();
+                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.SHOW, subCommandToken.SubCommandType);
+                }
+            }
+            else
+            {
+                throw new ExpectedSubCommandException(BudgetMainCommandEnum.SHOW);
+            }
+        }
+
+        void GetShowBillArgs(List<BudgetTokenBase> remainingTokens, out int billId)
+        {
+            if (remainingTokens.Count != 1)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
+            }
+            if (remainingTokens[0].TokenType != BudgetTokenEnum.NUMBER)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
+            }
+            billId = (int)((NumberToken)remainingTokens[0]).Value;
         }
 
         OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)

@@ -11,6 +11,8 @@ namespace BudgetCLI.Core.Objects
 
     public enum OutputTokenEnum
     {
-        SIMPLE_TEXT
+        SIMPLE_TEXT,
+        ERROR_TEXT,
+        SINGLE_ONE_TIME_BILL
     }
 }

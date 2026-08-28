@@ -13,6 +13,7 @@ namespace BudgetCLI.Scanner.Tokens
 
     public enum SubCommandEnum
     {
-        BILL
+        BILL,
+        BILLS
     }
 }
