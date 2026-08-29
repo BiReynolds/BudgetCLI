@@ -85,6 +85,27 @@ namespace BudgetCLI.Data
             }
         }
 
+        public static List<OneTimeBillModel> GetAllOneTimeBills(SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT * FROM OneTimeBills;
+            """;
+            SqliteDataReader reader = command.ExecuteReader();
+            List<OneTimeBillModel> result = new();
+            while (reader.Read())
+            {
+                result.Add(new OneTimeBillModel(
+                    reader.GetInt16(0),
+                    reader.GetString(1),
+                    reader.GetDecimal(2),
+                    DateOnly.FromDateTime(reader.GetDateTime(3)),
+                    reader.GetBoolean(4)
+                ));
+            }
+            return result;
+        }
+
         public static bool DeleteOneTimeBillById(int id, SqliteConnection connection)
         {
             SqliteCommand command = connection.CreateCommand();

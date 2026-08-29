@@ -11,7 +11,8 @@ namespace BudgetCLI.Scanner.Tokens
 
         static Dictionary<string, SubCommandEnum> StringToSubCommandDict = new()
         {
-            {"bill", SubCommandEnum.BILL}
+            {"bill", SubCommandEnum.BILL},
+            {"bills", SubCommandEnum.BILLS}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)

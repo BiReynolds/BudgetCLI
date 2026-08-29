@@ -6,6 +6,14 @@ namespace BudgetCLI.Testing
 {
     public static class DatabaseTesting
     {
+        public static void ResetTestData()
+        {
+            SqliteConnection connection = DatabaseHelper.GetReadWriteConnection();
+            connection.Open();
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = File.ReadAllText("./Testing/TestScripts/ResetTestOneTimeBills.sql");
+            command.ExecuteNonQuery();
+        }
         public static void OneTimeBillTest()
         {
             OneTimeBillModel testBill = new("OneTimeBillTest testBill", 100.00m, DateOnly.FromDateTime(DateTime.Today), false);

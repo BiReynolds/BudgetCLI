@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using BudgetCLI.Core.Objects;
 using BudgetCLI.Core.Interfaces;
 using BudgetCLI.Scanner.Tokens;
@@ -5,7 +6,6 @@ using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
 using BudgetCLI.Data;
 using BudgetCLI.Data.Models;
-using Microsoft.Data.Sqlite;
 
 namespace BudgetCLI.Evaluator 
 {
@@ -57,6 +57,10 @@ namespace BudgetCLI.Evaluator
                             Connection.Close();
                             return new SingleOneTimeBillModelDetail(model);
                         }
+                    case SubCommandEnum.BILLS:
+                        GetShowBillsArgs(remainingTokens[1..]);
+                        List<OneTimeBillModel> allBills = DatabaseHelper.GetAllOneTimeBills(Connection);
+                        return new OneTimeBillList(allBills);
                     default:
                         Connection.Close();
                         throw new SubCommandNotSupportedException(BudgetMainCommandEnum.SHOW, subCommandToken.SubCommandType);
@@ -79,6 +83,14 @@ namespace BudgetCLI.Evaluator
                 throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
             }
             billId = (int)((NumberToken)remainingTokens[0]).Value;
+        }
+
+        void GetShowBillsArgs(List<BudgetTokenBase> remainingTokens)
+        {
+            if (remainingTokens.Count != 0)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 0);
+            }
         }
 
         OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)
