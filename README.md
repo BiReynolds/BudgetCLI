@@ -10,7 +10,7 @@
 - Pull specific bill info
     - [x] Syntax: `show bill [id]`
 - Pull List of One-Time Bills
-    - [ ] Syntax: `show bills`
+    - [x] Syntax: `show bills`
 
 ## Upcoming
 ### Minimal Functionality
