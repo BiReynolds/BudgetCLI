@@ -17,6 +17,7 @@ namespace BudgetCLI.Core.Objects
         STRING,
         DATE,
         MAIN_COMMAND,
-        SUB_COMMAND
+        SUB_COMMAND,
+        ERROR
     }
 }

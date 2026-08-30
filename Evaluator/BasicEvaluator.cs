@@ -50,7 +50,7 @@ namespace BudgetCLI.Evaluator
                         if (model == null)
                         {
                             Connection.Close();
-                            return new ErrorTextOutput($"No bill in db with id = {billId}");
+                            throw new Exception($"No bill in db with id = {billId}");
                         }
                         else
                         {

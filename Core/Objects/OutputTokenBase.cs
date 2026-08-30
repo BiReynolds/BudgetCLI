@@ -14,6 +14,7 @@ namespace BudgetCLI.Core.Objects
         SIMPLE_TEXT,
         ERROR_TEXT,
         SINGLE_ONE_TIME_BILL,
-        ONE_TIME_BILL_LIST
+        ONE_TIME_BILL_LIST,
+        ERROR
     }
 }

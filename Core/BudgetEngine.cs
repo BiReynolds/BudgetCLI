@@ -45,8 +45,15 @@ namespace BudgetCLI.Core
 
         public void HandleUserInput()
         {
-            CurrentScannedTokens = Scanner.Scan(CurrentInput);
-            CurrentOutput = Evaluator.Evaluate(CurrentScannedTokens);
+            try
+            {
+                CurrentScannedTokens = Scanner.Scan(CurrentInput);
+                CurrentOutput = Evaluator.Evaluate(CurrentScannedTokens);
+            }
+            catch (Exception e)
+            {
+                CurrentOutput = new ErrorToken(e);
+            }
             Renderer.Render(CurrentOutput);
         }
 
