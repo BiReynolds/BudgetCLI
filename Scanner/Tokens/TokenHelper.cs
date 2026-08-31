@@ -10,14 +10,18 @@ namespace BudgetCLI.Scanner.Tokens
             {"delete", BudgetMainCommandEnum.DELETE},
             {"paid", BudgetMainCommandEnum.PAID},
             {"unpaid", BudgetMainCommandEnum.UNPAID},
+            {"edit", BudgetMainCommandEnum.EDIT},
             {"save", BudgetMainCommandEnum.SAVE},
-            {"reset", BudgetMainCommandEnum.RESET}
+            {"reset", BudgetMainCommandEnum.RESET},
         };
 
         static Dictionary<string, SubCommandEnum> StringToSubCommandDict = new()
         {
             {"bill", SubCommandEnum.BILL},
-            {"bills", SubCommandEnum.BILLS}
+            {"bills", SubCommandEnum.BILLS},
+            {"name", SubCommandEnum.NAME},
+            {"amount", SubCommandEnum.AMOUNT},
+            {"duedate", SubCommandEnum.DUE_DATE}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)
@@ -126,7 +130,7 @@ namespace BudgetCLI.Scanner.Tokens
         public static bool TryGetCommandType(string tokenString, out BudgetMainCommandEnum? mainCommandToken)
         {
             BudgetMainCommandEnum result;
-            if (StringToCommandDict.TryGetValue(tokenString, out result))
+            if (StringToCommandDict.TryGetValue(tokenString.ToLower(), out result))
             {
                 mainCommandToken = result;
                 return true;
@@ -140,8 +144,7 @@ namespace BudgetCLI.Scanner.Tokens
 
         public static bool TryGetSubCommand(string tokenString, out SubCommandEnum? subCommandEnum)
         {
-            SubCommandEnum result;
-            if (StringToSubCommandDict.TryGetValue(tokenString, out result))
+            if (StringToSubCommandDict.TryGetValue(tokenString.ToLower(), out SubCommandEnum result))
             {
                 subCommandEnum = result;
                 return true;

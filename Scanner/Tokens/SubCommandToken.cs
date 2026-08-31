@@ -14,6 +14,9 @@ namespace BudgetCLI.Scanner.Tokens
     public enum SubCommandEnum
     {
         BILL,
-        BILLS
+        BILLS,
+        NAME,
+        AMOUNT,
+        DUE_DATE
     }
 }

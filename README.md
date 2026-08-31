@@ -9,24 +9,25 @@
 - Pull List of One-Time Bills
     - Syntax: `show bills`
 - Pull specific bill info by name
-    - [x] Syntax: `show bill '[name]'`
+    - Syntax: `show bill '[name]'`
 - Mark bill paid by name or id
-    - [x] Syntax: `paid '[name]'`
-    - [x] Syntax: `paid [id]`
+    - Syntax: `paid '[name]'`
+    - Syntax: `paid [id]`
 - Mark bill unpaid by name or id
-    - [x] Syntax: `unpaid bill '[name]'`
-    - [x] Syntax: `unpaid bill [id]`
+    - Syntax: `unpaid '[name]'`
+    - Syntax: `unpaid [id]`
+- Edit existing bill by name or id
+    - [x] Syntax: `edit [name or id] [field] [newValue]`
+        - [x] Add necessary field tokens as subcommands (Name, Amount, DueDate)
 
 ## In Progress
 ### Minimal Functionality
-- Edit existing bill by name or id
-    - [ ] Syntax: `edit bill '[name]'`
-    - [ ] Syntax: `edit bill [id]`
 - Add Query logic for `show` command
     - [ ] Allow `unpaid` modifier
     - [ ] Allow `due < before | after |  > < today | [date] >`
     - [ ] Allow `name contains '[queryString]'`
     - [ ] Allow `amount < <= | >= > [amount]`
+    - [ ] Allow multiple query clauses in same query
 ## Upcoming
 ### Technical / Backend changes
 - Refactor BasicEvaluator so that any command which takes a bill as argument uses the GetShownBillFromArgs method (including those in ShowCommandHelper)
@@ -44,3 +45,4 @@
 
 
 ### Future 
+- Open to suggestions!
