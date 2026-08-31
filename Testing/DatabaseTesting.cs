@@ -37,7 +37,7 @@ namespace BudgetCLI.Testing
             }
             else
             {
-                OneTimeBillModel? billPulledById = DatabaseHelper.GetOneTimeBillById(billPulledByName.Id ?? 0, connection);
+                OneTimeBillModel? billPulledById = DatabaseHelper.GetOneTimeBillById(billPulledByName.Id, connection);
                 if (billPulledById == null)
                 {
                     transaction.Rollback();
@@ -48,7 +48,7 @@ namespace BudgetCLI.Testing
                     Console.WriteLine("Successfully pulled testBill from database by Id");
                 }
 
-                if (DatabaseHelper.DeleteOneTimeBillById(billPulledByName.Id ?? 0, connection))
+                if (DatabaseHelper.DeleteOneTimeBillById(billPulledByName.Id, connection))
                 {
                     Console.WriteLine("successfully deleted testBill");
                 }

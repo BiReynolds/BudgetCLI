@@ -4,9 +4,12 @@ namespace BudgetCLI.Scanner.Tokens
     {
         static Dictionary<string, BudgetMainCommandEnum> StringToCommandDict = new()
         {
+            {"exit", BudgetMainCommandEnum.EXIT},
             {"show", BudgetMainCommandEnum.SHOW},
             {"add", BudgetMainCommandEnum.ADD},
-            {"delete", BudgetMainCommandEnum.DELETE}
+            {"delete", BudgetMainCommandEnum.DELETE},
+            {"save", BudgetMainCommandEnum.SAVE},
+            {"reset", BudgetMainCommandEnum.RESET}
         };
 
         static Dictionary<string, SubCommandEnum> StringToSubCommandDict = new()

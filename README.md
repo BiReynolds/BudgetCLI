@@ -14,8 +14,11 @@
 - Pull specific bill info by name
     - [ ] Syntax: `show bill '[name]'`
 - Mark bill paid by name or id
-    - [ ] Syntax: `show bill '[name]'`
-    - [ ] Syntax: `show bill [id]`
+    - [ ] Syntax: `paid bill '[name]'`
+    - [ ] Syntax: `paid bill [id]`
+- Mark bill unpaid by name or id
+    - [ ] Syntax: `unpaid bill '[name]'`
+    - [ ] Syntax: `unpaid bill [id]`
 - Edit existing bill by name or id
     - [ ] Syntax: `edit bill '[name]'`
     - [ ] Syntax: `edit bill [id]`

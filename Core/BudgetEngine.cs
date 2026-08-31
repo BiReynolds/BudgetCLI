@@ -1,5 +1,6 @@
 using BudgetCLI.Core.Objects;
 using BudgetCLI.Core.Interfaces;
+using BudgetCLI.Session;
 
 namespace BudgetCLI.Core
 {
@@ -11,6 +12,7 @@ namespace BudgetCLI.Core
         IRenderer Renderer;
         string CurrentInput = "";
         List<BudgetTokenBase> CurrentScannedTokens = [];
+        SessionManager Session = new();
         OutputTokenBase? CurrentOutput;
         public BudgetEngine(IScanner scanner, IEvaluator evaluator, IRenderer renderer)
         {
@@ -29,10 +31,6 @@ namespace BudgetCLI.Core
                 if (rawInput.Length == 0)
                 {
                     HandleEmptyInput();
-                }
-                else if (rawInput.ToLower() == "exit")
-                {
-                    Running = false;
                 }
                 else
                 {
@@ -64,6 +62,13 @@ namespace BudgetCLI.Core
 
         public virtual void InitActions()
         {
+            Session.InitSession();
+
+            Evaluator.SetSessionData(Session);
+            Evaluator.SafeExitEvent += (o, e) =>
+            {
+                Running = false;
+            };
             Console.WriteLine("starting program");
         }
 

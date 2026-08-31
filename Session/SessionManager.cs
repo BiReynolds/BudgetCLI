@@ -26,9 +26,30 @@ namespace BudgetCLI.Session
             IsInitialized = true;
         }
 
+        public void ResetSession()
+        {
+            UnsavedChanges = false;
+            InitSession();
+        }
+
         public void SaveSession()
         {
-            throw new NotImplementedException();
+            Connection.Open();
+            foreach (OneTimeBillModel billModel in SessionBillList)
+            {
+                if (billModel.Id == -1) {
+                    if (!billModel.IsDeleted)
+                    {
+                        DatabaseHelper.AddOneTimeBillToDatabase(billModel, Connection);
+                    }
+                }
+                else if (billModel.IsDeleted)
+                {
+                    DatabaseHelper.DeleteOneTimeBillById(billModel.Id, Connection);
+                }
+            }
+            Connection.Close();
+            ResetSession();
         }
 
         public void AddNewOneTimeBill(OneTimeBillModel billModel)
@@ -44,12 +65,12 @@ namespace BudgetCLI.Session
             {
                 return false;
             }
-            bool result = SessionBillList.Remove(chosenBill);
-            if (result)
+            else
             {
+                chosenBill.IsDeleted = true;
                 UnsavedChanges = true;
+                return true;
             }
-            return result;
         }
     }
 }

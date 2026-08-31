@@ -11,6 +11,9 @@ namespace BudgetCLI.Core.Objects
 
     public enum OutputTokenEnum
     {
+        EXIT_NOTIFICATION,
+        SAVE_NOTIFICATION,
+        RESET_NOTIFICATION,
         SIMPLE_TEXT,
         ERROR_TEXT,
         SINGLE_ONE_TIME_BILL,

@@ -3,6 +3,7 @@ namespace BudgetCLI.Data.Models
     public class OneTimeBillModel
     {
         public event EventHandler? OneTimeBillModelChanged;
+        public bool IsDeleted { get; set; }
         public bool IsChanged { 
             get; 
             private set
@@ -14,7 +15,7 @@ namespace BudgetCLI.Data.Models
                 }
             }
         }
-        public int? Id { 
+        public int Id { 
             get; 
             set
             {
@@ -24,7 +25,7 @@ namespace BudgetCLI.Data.Models
                     IsChanged = true;
                 }
             }
-        }
+        } = -1;
         public string Name { 
             get; 
             set
@@ -71,7 +72,7 @@ namespace BudgetCLI.Data.Models
         }
         public OneTimeBillModel(string name, decimal amount, DateOnly dueDate, bool isPaid)
         {
-            Id = null;
+            Id = -1;
             Name = name;
             Amount = amount;
             DueDate = dueDate;

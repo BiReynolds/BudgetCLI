@@ -18,6 +18,14 @@ namespace BudgetCLI.Data
             }
         }
 
+        public static IEnumerable<OneTimeBillModel> FilterByDeleted(IEnumerable<OneTimeBillModel> billList, bool testIsDeleted)
+        {
+            IEnumerable<OneTimeBillModel> result = billList.Where(
+                x => x.IsDeleted == testIsDeleted
+            );
+            return result;
+        }
+
         public static IEnumerable<OneTimeBillModel> FilterByPaid(IEnumerable<OneTimeBillModel> billList, bool testIsPaid)
         {
             IEnumerable<OneTimeBillModel> result = billList.Where(

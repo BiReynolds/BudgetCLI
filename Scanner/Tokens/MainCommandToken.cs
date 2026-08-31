@@ -13,9 +13,12 @@ namespace BudgetCLI.Scanner.Tokens
 
     public enum BudgetMainCommandEnum
     {
+        EXIT,
         SHOW,
         ADD,
-        DELETE
+        DELETE,
+        SAVE,
+        RESET
     }
 
 }

@@ -20,5 +20,17 @@ namespace BudgetCLI.Renderer
                     return content + new string(' ', numBlanks);
             }
         }
+
+        public static string GetIdOrQuestionMark(int id)
+        {
+            if (id == -1)
+            {
+                return "?";
+            }
+            else
+            {
+                return id.ToString();
+            }
+        }
     }
 }

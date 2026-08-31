@@ -4,13 +4,13 @@ using BudgetCLI.Data.Models;
 using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
 using BudgetCLI.Scanner.Tokens;
-using Microsoft.Data.Sqlite;
+using BudgetCLI.Session;
 
 namespace BudgetCLI.Evaluator.CommandHelpers
 {
     public static class ShowCommandHelper
     {
-        public static OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens, SqliteConnection connection)
+        public static OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens, SessionManager session)
         {
             if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
             {
@@ -18,35 +18,27 @@ namespace BudgetCLI.Evaluator.CommandHelpers
                 switch (subCommandToken.SubCommandType)
                 {
                     case SubCommandEnum.BILL:
-                        return EvaluateShowBillCommand(remainingTokens[1..], connection);
+                        GetShowBillArgs(remainingTokens[1..], out int billId);
+                        OneTimeBillModel? model = FilterHelper.GetById(session.SessionBillList, billId);
+                        if (model == null)
+                        {
+                            throw new Exception($"No bill in db with id = {billId}");
+                        }
+                        else
+                        {
+                            return new SingleOneTimeBillModelDetail(model);
+                        }
                     case SubCommandEnum.BILLS:
                         GetShowBillsArgs(remainingTokens[1..]);
-                        List<OneTimeBillModel> allBills = DatabaseHelper.GetAllOneTimeBills(connection);
-                        return new OneTimeBillList(allBills);
+                        IEnumerable<OneTimeBillModel> allActiveBills = FilterHelper.FilterByDeleted(session.SessionBillList, false);
+                        return new OneTimeBillList(allActiveBills);
                     default:
-                        connection.Close();
                         throw new SubCommandNotSupportedException(BudgetMainCommandEnum.SHOW, subCommandToken.SubCommandType);
                 }
             }
             else
             {
                 throw new ExpectedSubCommandException(BudgetMainCommandEnum.SHOW);
-            }
-        }
-
-        static OutputTokenBase EvaluateShowBillCommand(List<BudgetTokenBase> remainingTokens, SqliteConnection connection)
-        {
-            GetShowBillArgs(remainingTokens[1..], out int billId);
-            OneTimeBillModel? model = DatabaseHelper.GetOneTimeBillById(billId, connection);
-            if (model == null)
-            {
-                connection.Close();
-                throw new Exception($"No bill in db with id = {billId}");
-            }
-            else
-            {
-                connection.Close();
-                return new SingleOneTimeBillModelDetail(model);
             }
         }
 

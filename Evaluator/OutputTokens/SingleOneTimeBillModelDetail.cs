@@ -12,7 +12,7 @@ namespace BudgetCLI.Evaluator.OutputTokens
         public bool IsPaid;
         public SingleOneTimeBillModelDetail(OneTimeBillModel model) : base(OutputTokenEnum.SINGLE_ONE_TIME_BILL)
         {
-            Id = model.Id ?? -1;
+            Id = model.Id;
             Name = model.Name;
             Amount = model.Amount;
             DueDate = model.DueDate;

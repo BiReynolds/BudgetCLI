@@ -1,26 +1,31 @@
-using Microsoft.Data.Sqlite;
 using BudgetCLI.Core.Objects;
 using BudgetCLI.Core.Interfaces;
 using BudgetCLI.Scanner.Tokens;
 using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
-using BudgetCLI.Data;
 using BudgetCLI.Data.Models;
 using BudgetCLI.Session;
+using BudgetCLI.Evaluator.CommandHelpers;
 
 namespace BudgetCLI.Evaluator 
 {
     public class BasicEvaluator : IEvaluator
     {
-        SessionManager Session = new();
+        public event EventHandler? SafeExitEvent;
+        public event EventHandler? UnsavedChangesExitEvent;
+        SessionManager? Session;
 
-        public void InitEvaluator()
+        public void SetSessionData(SessionManager session)
         {
-            Session.InitSession();
+            Session = session;
         }
 
         public OutputTokenBase Evaluate(List<BudgetTokenBase> tokens)
         {
+            if (Session == null)
+            {
+                throw new Exception("Session data is null at Evaluate - did you call SetSessionData?");
+            }
             BudgetTokenBase firstToken = tokens[0];
             if (firstToken.TokenType != BudgetTokenEnum.MAIN_COMMAND)
             {
@@ -32,67 +37,34 @@ namespace BudgetCLI.Evaluator
             }
             switch (commandToken.CommandType)
             {
+                case BudgetMainCommandEnum.EXIT:
+                    return EvaluateExitCommand();
                 case BudgetMainCommandEnum.SHOW:
-                    return EvaluateShowCommand(tokens[1..]);
+                    return ShowCommandHelper.EvaluateShowCommand(tokens[1..], Session);
                 case BudgetMainCommandEnum.ADD:
                     return EvaluateAddCommand(tokens[1..]);
                 case BudgetMainCommandEnum.DELETE:
                     return EvaluateDeleteCommand(tokens[1..]);
+                case BudgetMainCommandEnum.SAVE:
+                    return EvaluateSaveCommand();
+                case BudgetMainCommandEnum.RESET:
+                    return EvaluateResetCommand();
                 default:
                     throw new CommandNotSupportedException(commandToken);
             }
         }
 
-        OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens)
+        OutputTokenBase EvaluateExitCommand()
         {
-            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            if (Session.UnsavedChanges)
             {
-                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
-                switch (subCommandToken.SubCommandType)
-                {
-                    case SubCommandEnum.BILL:
-                        GetShowBillArgs(remainingTokens[1..], out int billId);
-                        OneTimeBillModel? model = FilterHelper.GetById(Session.SessionBillList, billId);
-                        if (model == null)
-                        {
-                            throw new Exception($"No bill in db with id = {billId}");
-                        }
-                        else
-                        {
-                            return new SingleOneTimeBillModelDetail(model);
-                        }
-                    case SubCommandEnum.BILLS:
-                        GetShowBillsArgs(remainingTokens[1..]);
-                        List<OneTimeBillModel> allBills = Session.SessionBillList;
-                        return new OneTimeBillList(allBills);
-                    default:
-                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.SHOW, subCommandToken.SubCommandType);
-                }
+                OnUnsavedChangesExitEvent(EventArgs.Empty);
+                return new ExitNotification(false);
             }
             else
             {
-                throw new ExpectedSubCommandException(BudgetMainCommandEnum.SHOW);
-            }
-        }
-
-        void GetShowBillArgs(List<BudgetTokenBase> remainingTokens, out int billId)
-        {
-            if (remainingTokens.Count != 1)
-            {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
-            }
-            if (remainingTokens[0].TokenType != BudgetTokenEnum.NUMBER)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
-            }
-            billId = (int)((NumberToken)remainingTokens[0]).Value;
-        }
-
-        void GetShowBillsArgs(List<BudgetTokenBase> remainingTokens)
-        {
-            if (remainingTokens.Count != 0)
-            {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 0);
+                OnSafeExitEvent(EventArgs.Empty);
+                return new ExitNotification(true);
             }
         }
 
@@ -180,6 +152,28 @@ namespace BudgetCLI.Evaluator
                 throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
             }
             billId = (int)((NumberToken)remainingTokens[0]).Value;
+        }
+
+        OutputTokenBase EvaluateSaveCommand()
+        {
+            Session?.SaveSession();
+            return new SaveNotification();
+        }
+
+        OutputTokenBase EvaluateResetCommand()
+        {
+            Session?.ResetSession();
+            return new ResetNotification();
+        }
+
+        void OnSafeExitEvent(EventArgs e)
+        {
+            SafeExitEvent?.Invoke(this, e);
+        }
+
+        void OnUnsavedChangesExitEvent(EventArgs e)
+        {
+            UnsavedChangesExitEvent?.Invoke(this, e);
         }
     }
 }
