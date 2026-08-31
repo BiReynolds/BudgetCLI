@@ -12,7 +12,7 @@
 ## In Progress
 ### Minimal Functionality
 - Pull specific bill info by name
-    - [ ] Syntax: `show bill '[name]'`
+    - [x] Syntax: `show bill '[name]'`
 - Mark bill paid by name or id
     - [ ] Syntax: `paid bill '[name]'`
     - [ ] Syntax: `paid bill [id]`
@@ -28,7 +28,6 @@
     - [ ] Allow `name contains '[queryString]'`
     - [ ] Allow `amount < <= | >= > [amount]`
 ## Upcoming
-### Minimal Functionality
 ### Basic Functionality
 - Add Recurring Bill (and corresponding one-time instances)
 - Delete Recurring Bill (and all one-time instances)

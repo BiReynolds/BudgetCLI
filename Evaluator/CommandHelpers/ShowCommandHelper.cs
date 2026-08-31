@@ -18,16 +18,7 @@ namespace BudgetCLI.Evaluator.CommandHelpers
                 switch (subCommandToken.SubCommandType)
                 {
                     case SubCommandEnum.BILL:
-                        GetShowBillArgs(remainingTokens[1..], out int billId);
-                        OneTimeBillModel? model = FilterHelper.GetById(session.SessionBillList, billId);
-                        if (model == null)
-                        {
-                            throw new Exception($"No bill in db with id = {billId}");
-                        }
-                        else
-                        {
-                            return new SingleOneTimeBillModelDetail(model);
-                        }
+                        return EvaluateShowBillCommand(remainingTokens[1..], session);
                     case SubCommandEnum.BILLS:
                         GetShowBillsArgs(remainingTokens[1..]);
                         IEnumerable<OneTimeBillModel> allActiveBills = FilterHelper.FilterByDeleted(session.SessionBillList, false);
@@ -42,17 +33,39 @@ namespace BudgetCLI.Evaluator.CommandHelpers
             }
         }
 
-        static void GetShowBillArgs(List<BudgetTokenBase> remainingTokens, out int billId)
+        static OutputTokenBase EvaluateShowBillCommand(List<BudgetTokenBase> remainingTokens, SessionManager session)
+        {
+            OneTimeBillModel? model = GetShownBillFromArgs(remainingTokens, session);
+            if (model == null)
+            {
+                throw new Exception($"No bill in db with criteria specified");
+            }
+            else
+            {
+                return new SingleOneTimeBillModelDetail(model);
+            }
+
+        }
+
+        static OneTimeBillModel? GetShownBillFromArgs(List<BudgetTokenBase> remainingTokens, SessionManager session)
         {
             if (remainingTokens.Count != 1)
             {
                 throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
             }
-            if (remainingTokens[0].TokenType != BudgetTokenEnum.NUMBER)
+
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.NUMBER)
             {
-                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
+                int billId = (int)((NumberToken)remainingTokens[0]).Value;
+                return FilterHelper.GetById(session.SessionBillList, billId);
             }
-            billId = (int)((NumberToken)remainingTokens[0]).Value;
+            else if (remainingTokens[0].TokenType == BudgetTokenEnum.STRING)
+            {
+                string billName = ((StringToken)remainingTokens[0]).Value;
+                return FilterHelper.GetByName(session.SessionBillList, billName);
+            }
+
+            throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
         }
 
         static void GetShowBillsArgs(List<BudgetTokenBase> remainingTokens)

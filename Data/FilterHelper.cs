@@ -18,6 +18,20 @@ namespace BudgetCLI.Data
             }
         }
 
+        public static OneTimeBillModel? GetByName(IEnumerable<OneTimeBillModel> billList, string name)
+        {
+            try
+            {
+                return billList.First(
+                    x => x.Name == name
+                );
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
+
         public static IEnumerable<OneTimeBillModel> FilterByDeleted(IEnumerable<OneTimeBillModel> billList, bool testIsDeleted)
         {
             IEnumerable<OneTimeBillModel> result = billList.Where(

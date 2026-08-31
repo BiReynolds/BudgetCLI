@@ -24,15 +24,20 @@ namespace BudgetCLI.Scanner
             while (CurrentIndex < rawString.Length)
             {
                 currentChar = ReadChar();
+                string nextWord;
                 if (char.IsWhiteSpace(currentChar))
                 {
                     continue;
                 }
+                else if (currentChar == '\'')
+                {
+                    nextWord = ReadToNextSingleQuote();
+                }
                 else
                 {
-                    string nextWord = ReadToNextWhiteSpace();
-                    AddToken(nextWord);
+                    nextWord = ReadToNextWhiteSpace();
                 }
+                AddToken(nextWord);
             }
             return OutputTokens;
         }
@@ -79,6 +84,18 @@ namespace BudgetCLI.Scanner
             {
                 result += ReadChar();
             }
+            return result;
+        }
+
+        public string ReadToNextSingleQuote()
+        {
+            string result = RawString[CurrentIndex - 1].ToString();
+            while (CurrentIndex < RawString.Length && PeekChar() != '\'')
+            {
+                result += ReadChar();
+            }
+            // need to call one more time to capture the closing single quote
+            result += ReadChar();
             return result;
         }
 
