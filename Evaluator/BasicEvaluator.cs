@@ -6,6 +6,7 @@ using BudgetCLI.Exceptions;
 using BudgetCLI.Data.Models;
 using BudgetCLI.Session;
 using BudgetCLI.Evaluator.CommandHelpers;
+using BudgetCLI.Data;
 
 namespace BudgetCLI.Evaluator 
 {
@@ -45,6 +46,10 @@ namespace BudgetCLI.Evaluator
                     return EvaluateAddCommand(tokens[1..]);
                 case BudgetMainCommandEnum.DELETE:
                     return EvaluateDeleteCommand(tokens[1..]);
+                case BudgetMainCommandEnum.PAID:
+                    return EvaluatePaidCommand(tokens[1..]);
+                case BudgetMainCommandEnum.UNPAID:
+                    return EvaluateUnpaidCommand(tokens[1..]);
                 case BudgetMainCommandEnum.SAVE:
                     return EvaluateSaveCommand();
                 case BudgetMainCommandEnum.RESET:
@@ -152,6 +157,56 @@ namespace BudgetCLI.Evaluator
                 throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
             }
             billId = (int)((NumberToken)remainingTokens[0]).Value;
+        }
+
+        OutputTokenBase EvaluatePaidCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            OneTimeBillModel? model = GetBillFromArgs(remainingTokens);
+            if (model == null)
+            {
+                throw new Exception($"No bill in db with criteria specified");
+            }
+            else
+            {
+                model.IsPaid = true;
+                return new SimpleTextOutput($"Marked {model.Name} as paid");
+            }
+        }
+
+        OutputTokenBase EvaluateUnpaidCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            OneTimeBillModel? model = GetBillFromArgs(remainingTokens);
+            if (model == null)
+            {
+                throw new Exception($"No bill in db with criteria specified");
+            }
+            else
+            {
+                model.IsPaid = false;
+                return new SimpleTextOutput($"Marked {model.Name} as unpaid");
+            }
+        }
+
+        OneTimeBillModel? GetBillFromArgs(List<BudgetTokenBase> remainingTokens)
+        {
+            // Exact same method as "ShowCommandHelper.GetShownBillFromArgs," and will likely also be used for other commands... but will need a slight refactor of various methods
+            if (remainingTokens.Count != 1)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
+            }
+
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.NUMBER)
+            {
+                int billId = (int)((NumberToken)remainingTokens[0]).Value;
+                return FilterHelper.GetById(Session.SessionBillList, billId);
+            }
+            else if (remainingTokens[0].TokenType == BudgetTokenEnum.STRING)
+            {
+                string billName = ((StringToken)remainingTokens[0]).Value;
+                return FilterHelper.GetByName(Session.SessionBillList, billName);
+            }
+
+            throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
         }
 
         OutputTokenBase EvaluateSaveCommand()

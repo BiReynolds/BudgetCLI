@@ -118,5 +118,25 @@ namespace BudgetCLI.Data
             // return value indicates whether a value was actually deleted from the db - i.e. if there was actually a value in the db with that id
             return numDeletions > 0;
         }
+
+        public static void UpdateOneTimeBill(OneTimeBillModel updatedModel, SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                UPDATE OneTimeBills
+                SET 
+                Name = $name,
+                Amount = $amount,
+                DueDate = $dueDate,
+                IsPaid = $isPaid
+                WHERE Id = $id
+            """;
+            command.Parameters.AddWithValue("$name", updatedModel.Name);
+            command.Parameters.AddWithValue("$amount", updatedModel.Amount);
+            command.Parameters.AddWithValue("$dueDate", updatedModel.DueDate);
+            command.Parameters.AddWithValue("$isPaid", updatedModel.IsPaid);
+            command.Parameters.AddWithValue("$id", updatedModel.Id);
+            command.ExecuteNonQuery();
+        }
     }
 }

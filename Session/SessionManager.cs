@@ -21,6 +21,10 @@ namespace BudgetCLI.Session
         {
             Connection.Open();
             SessionBillList = DatabaseHelper.GetAllOneTimeBills(Connection);
+            foreach (OneTimeBillModel model in SessionBillList)
+            {
+                RegisterEventsForOneTimeBill(model);
+            }
 
             Connection.Close();
             IsInitialized = true;
@@ -47,6 +51,10 @@ namespace BudgetCLI.Session
                 {
                     DatabaseHelper.DeleteOneTimeBillById(billModel.Id, Connection);
                 }
+                else if (billModel.IsChanged)
+                {
+                    DatabaseHelper.UpdateOneTimeBill(billModel, Connection);
+                }
             }
             Connection.Close();
             ResetSession();
@@ -71,6 +79,14 @@ namespace BudgetCLI.Session
                 UnsavedChanges = true;
                 return true;
             }
+        }
+
+        public void RegisterEventsForOneTimeBill(OneTimeBillModel model)
+        {
+            model.OneTimeBillModelChanged += (o, e) =>
+            {
+                UnsavedChanges = true;
+            };
         }
     }
 }

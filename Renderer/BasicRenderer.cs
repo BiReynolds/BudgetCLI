@@ -82,7 +82,7 @@ namespace BudgetCLI.Renderer
             dataTable.AddColumn("Name", 15, x => x.Name);
             dataTable.AddColumn("Amount", 10, x => x.Amount.ToString("C"), TextAlignment.RIGHT);
             dataTable.AddColumn("Due Date", 12, x => x.DueDate.ToShortDateString(), TextAlignment.CENTER);
-            dataTable.AddColumn("Paid?", 5, x => { return x.IsPaid ? "x" : ""; });
+            dataTable.AddColumn("Paid?", 5, x => { return x.IsPaid ? "x" : ""; }, TextAlignment.CENTER);
             
             dataTable.SetData(billList.Data);
             dataTable.Render();

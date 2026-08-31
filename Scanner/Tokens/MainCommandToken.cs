@@ -17,8 +17,10 @@ namespace BudgetCLI.Scanner.Tokens
         SHOW,
         ADD,
         DELETE,
+        PAID,
+        UNPAID,
         SAVE,
-        RESET
+        RESET,
     }
 
 }

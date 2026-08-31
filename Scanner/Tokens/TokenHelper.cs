@@ -8,6 +8,8 @@ namespace BudgetCLI.Scanner.Tokens
             {"show", BudgetMainCommandEnum.SHOW},
             {"add", BudgetMainCommandEnum.ADD},
             {"delete", BudgetMainCommandEnum.DELETE},
+            {"paid", BudgetMainCommandEnum.PAID},
+            {"unpaid", BudgetMainCommandEnum.UNPAID},
             {"save", BudgetMainCommandEnum.SAVE},
             {"reset", BudgetMainCommandEnum.RESET}
         };
