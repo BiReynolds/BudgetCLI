@@ -2,11 +2,73 @@ namespace BudgetCLI.Data.Models
 {
     public class OneTimeBillModel
     {
-        public int? Id { get; set; }
-        public string Name { get; set; }
-        public decimal Amount { get; set; }
-        public DateOnly DueDate { get; set; }
-        public bool IsPaid { get; set; }
+        public event EventHandler? OneTimeBillModelChanged;
+        public bool IsChanged { 
+            get; 
+            private set
+            {
+                field = value;
+                if (field)
+                {
+                    OnOneTimeBillModelChanged(EventArgs.Empty);
+                }
+            }
+        }
+        public int? Id { 
+            get; 
+            set
+            {
+                if (field != value)
+                {
+                    field = value;
+                    IsChanged = true;
+                }
+            }
+        }
+        public string Name { 
+            get; 
+            set
+            {
+                if (field != value)
+                {
+                    field = value;
+                    IsChanged = true;
+                }
+            } 
+        }
+        public decimal Amount { 
+            get; 
+            set
+            {
+                if (field != value)
+                {
+                    field = value;
+                    IsChanged = true;
+                }
+            }
+        }
+        public DateOnly DueDate { 
+            get; 
+            set
+            {
+                if (field != value)
+                {
+                    field = value;
+                    IsChanged = true;
+                }
+            }
+        }
+        public bool IsPaid { 
+            get; 
+            set
+            {
+                if (field != value)
+                {
+                    field = value;
+                    IsChanged = true;
+                }
+            }
+        }
         public OneTimeBillModel(string name, decimal amount, DateOnly dueDate, bool isPaid)
         {
             Id = null;
@@ -32,6 +94,11 @@ namespace BudgetCLI.Data.Models
             result += $"DueDate: {DueDate}\n";
             result += $"IsPaid: {IsPaid}";
             return result;
+        }
+
+        private void OnOneTimeBillModelChanged(EventArgs e)
+        {
+            OneTimeBillModelChanged?.Invoke(this, e);
         }
     }
 }

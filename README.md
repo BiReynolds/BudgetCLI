@@ -1,21 +1,31 @@
 # Budget CLI
 ## Current Behavior
+- Add One-Time Bill
+    - Syntax: `add bill '[name]' [amount] [dueDate]`
+- Delete One-Time Bill by Name
+    - Syntax: `delete bill [id]`
+- Pull specific bill info
+    - Syntax: `show bill [id]`
+- Pull List of One-Time Bills
+    - Syntax: `show bills`
 
 ## In Progress
 ### Minimal Functionality
-- Add One-Time Bill
-    - [x] Syntax: `add bill '[name]' [amount] [dueDate]`
-- Delete One-Time Bill by Name
-    - [x] Syntax: `delete bill [id]`
-- Pull specific bill info
-    - [x] Syntax: `show bill [id]`
-- Pull List of One-Time Bills
-    - [x] Syntax: `show bills`
-
+- Pull specific bill info by name
+    - [ ] Syntax: `show bill '[name]'`
+- Mark bill paid by name or id
+    - [ ] Syntax: `show bill '[name]'`
+    - [ ] Syntax: `show bill [id]`
+- Edit existing bill by name or id
+    - [ ] Syntax: `edit bill '[name]'`
+    - [ ] Syntax: `edit bill [id]`
+- Add Query logic for `show` command
+    - [ ] Allow `unpaid` modifier
+    - [ ] Allow `due < before | after |  > < today | [date] >`
+    - [ ] Allow `name contains '[queryString]'`
+    - [ ] Allow `amount < <= | >= > [amount]`
 ## Upcoming
 ### Minimal Functionality
-- Mark bill paid
-- Edit existing bill
 ### Basic Functionality
 - Add Recurring Bill (and corresponding one-time instances)
 - Delete Recurring Bill (and all one-time instances)

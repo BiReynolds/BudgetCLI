@@ -6,12 +6,19 @@ using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
 using BudgetCLI.Data;
 using BudgetCLI.Data.Models;
+using BudgetCLI.Session;
 
 namespace BudgetCLI.Evaluator 
 {
     public class BasicEvaluator : IEvaluator
     {
-        SqliteConnection Connection = DatabaseHelper.GetReadWriteConnection();
+        SessionManager Session = new();
+
+        public void InitEvaluator()
+        {
+            Session.InitSession();
+        }
+
         public OutputTokenBase Evaluate(List<BudgetTokenBase> tokens)
         {
             BudgetTokenBase firstToken = tokens[0];
@@ -38,7 +45,6 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens)
         {
-            Connection.Open();
             if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
             {
                 SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
@@ -46,23 +52,20 @@ namespace BudgetCLI.Evaluator
                 {
                     case SubCommandEnum.BILL:
                         GetShowBillArgs(remainingTokens[1..], out int billId);
-                        OneTimeBillModel? model = DatabaseHelper.GetOneTimeBillById(billId, Connection);
+                        OneTimeBillModel? model = FilterHelper.GetById(Session.SessionBillList, billId);
                         if (model == null)
                         {
-                            Connection.Close();
                             throw new Exception($"No bill in db with id = {billId}");
                         }
                         else
                         {
-                            Connection.Close();
                             return new SingleOneTimeBillModelDetail(model);
                         }
                     case SubCommandEnum.BILLS:
                         GetShowBillsArgs(remainingTokens[1..]);
-                        List<OneTimeBillModel> allBills = DatabaseHelper.GetAllOneTimeBills(Connection);
+                        List<OneTimeBillModel> allBills = Session.SessionBillList;
                         return new OneTimeBillList(allBills);
                     default:
-                        Connection.Close();
                         throw new SubCommandNotSupportedException(BudgetMainCommandEnum.SHOW, subCommandToken.SubCommandType);
                 }
             }
@@ -95,7 +98,6 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)
         {
-            Connection.Open();
             if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
             {
                 SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
@@ -104,17 +106,14 @@ namespace BudgetCLI.Evaluator
                     case SubCommandEnum.BILL:
                         GetAddBillArgs(remainingTokens[1..], out string name, out decimal amount, out DateOnly dueDate);
                         OneTimeBillModel model = new(name, amount, dueDate, false);
-                        DatabaseHelper.AddOneTimeBillToDatabase(model, Connection);
-                        Connection.Close();
-                        return new SimpleTextOutput($"Bill {name} added to database");
+                        Session.AddNewOneTimeBill(model);
+                        return new SimpleTextOutput($"Bill {name} added");
                     default:
-                        Connection.Close();
                         throw new SubCommandNotSupportedException(BudgetMainCommandEnum.ADD, subCommandToken.SubCommandType);
                 }
             }
             else
             {
-                Connection.Close();
                 throw new ExpectedSubCommandException(BudgetMainCommandEnum.ADD);
             }
         }
@@ -144,7 +143,6 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateDeleteCommand(List<BudgetTokenBase> remainingTokens)
         {
-            Connection.Open();
             if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
             {
                 SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
@@ -152,7 +150,7 @@ namespace BudgetCLI.Evaluator
                 {
                     case SubCommandEnum.BILL:
                         GetDeleteBillArgs(remainingTokens[1..], out int billId);
-                        bool didDelete = DatabaseHelper.DeleteOneTimeBillById(billId, Connection);
+                        bool didDelete = Session.DeleteOneTimeBillById(billId);
                         if (didDelete)
                         {
                             return new SimpleTextOutput($"bill with id {billId} deleted");
@@ -167,7 +165,6 @@ namespace BudgetCLI.Evaluator
             }
             else
             {
-                Connection.Close();
                 throw new ExpectedSubCommandException(BudgetMainCommandEnum.ADD);
             }
         }

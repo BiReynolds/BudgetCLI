@@ -18,6 +18,8 @@ namespace BudgetCLI.Core.Objects
         DATE,
         MAIN_COMMAND,
         SUB_COMMAND,
-        ERROR
+        ERROR,
+        DATE_RELATION,
+
     }
 }
