@@ -26,6 +26,12 @@ namespace BudgetCLI.Scanner.Tokens
         BILLS,
         NAME,
         AMOUNT,
-        DUE_DATE
+        DUE_DATE,
+        EQUAL, 
+        LESS_THAN,
+        GREATER_THAN,
+        LESS_OR_EQUAL,
+        GREATER_OR_EQUAL,
+        CONTAINS
     }
 }

@@ -66,19 +66,10 @@ namespace BudgetCLI.Session
             SessionBillList.Add(billModel);
         }
 
-        public bool DeleteOneTimeBillById(int billId)
+        public void DeleteOneTimeBill(OneTimeBillModel chosenBill)
         {
-            OneTimeBillModel? chosenBill = FilterHelper.GetById(SessionBillList, billId);
-            if (chosenBill == null)
-            {
-                return false;
-            }
-            else
-            {
-                chosenBill.IsDeleted = true;
-                UnsavedChanges = true;
-                return true;
-            }
+            chosenBill.IsDeleted = true;
+            UnsavedChanges = true;
         }
 
         public void RegisterEventsForOneTimeBill(OneTimeBillModel model)

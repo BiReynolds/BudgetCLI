@@ -1,6 +1,7 @@
 using BudgetCLI.Core.Objects;
 using BudgetCLI.Data;
 using BudgetCLI.Data.Models;
+using BudgetCLI.Evaluator.Objects;
 using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
 using BudgetCLI.Scanner.Tokens;
@@ -26,9 +27,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
                     case ReservedWordEnum.BILL:
                         return EvaluateShowBillCommand(remainingTokens[1..]);
                     case ReservedWordEnum.BILLS:
-                        GetShowBillsArgs(remainingTokens[1..]);
-                        IEnumerable<OneTimeBillModel> allActiveBills = FilterHelper.FilterByDeleted(Session.SessionBillList, false);
-                        return new OneTimeBillList(allActiveBills);
+                        return EvaluateShowBillsCommand(remainingTokens[1..]);
                     default:
                         throw new SubCommandNotSupportedException(ReservedWordEnum.SHOW, ReservedWordToken.ReservedWord);
                 }
@@ -53,12 +52,19 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
 
         }
 
-        void GetShowBillsArgs(List<BudgetTokenBase> remainingTokens)
+        OutputTokenBase EvaluateShowBillsCommand(List<BudgetTokenBase> remainingTokens)
         {
-            if (remainingTokens.Count != 0)
+            IEnumerable<OneTimeBillModel> filteredBills = Session.SessionBillList;
+            if (remainingTokens.Count == 0)
             {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 0);
+                filteredBills = filteredBills.Where(x => !x.IsPaid);
             }
+            List<FilterInfo> filters = EvaluateHelper.GetAllFiltersFromArgs(remainingTokens);
+            foreach (FilterInfo filter in filters)
+            {
+                filteredBills = EvaluateHelper.ApplyFilterToOneTimeBillModels(filteredBills, filter);
+            }
+            return new OneTimeBillList(filteredBills);
         }
     }
 }

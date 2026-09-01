@@ -17,7 +17,13 @@ namespace BudgetCLI.Scanner.Tokens
             {"bills", ReservedWordEnum.BILLS},
             {"name", ReservedWordEnum.NAME},
             {"amount", ReservedWordEnum.AMOUNT},
-            {"duedate", ReservedWordEnum.DUE_DATE}
+            {"duedate", ReservedWordEnum.DUE_DATE},
+            {"<", ReservedWordEnum.LESS_THAN},
+            {">", ReservedWordEnum.GREATER_THAN},
+            {"=", ReservedWordEnum.EQUAL},
+            {"<=", ReservedWordEnum.LESS_OR_EQUAL},
+            {">=", ReservedWordEnum.GREATER_OR_EQUAL},
+            {"contains", ReservedWordEnum.CONTAINS}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)

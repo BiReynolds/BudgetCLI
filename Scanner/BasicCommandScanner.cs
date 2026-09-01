@@ -7,6 +7,7 @@ namespace BudgetCLI.Scanner
 {
     public class BasicCommandScanner : IScanner
     {
+        static char[] SpecialCharacters = ['\'', '=', '<', '>'];
         string RawString = "";
         int CurrentIndex = 0;
         List<BudgetTokenBase> OutputTokens = [];
@@ -33,9 +34,17 @@ namespace BudgetCLI.Scanner
                 {
                     nextWord = ReadToNextSingleQuote();
                 }
+                else if (currentChar == '<' || currentChar == '>')
+                {
+                    nextWord = ReadWordWithLeadingComparator();
+                }
+                else if (currentChar == '=')
+                {
+                    nextWord = currentChar.ToString();
+                }
                 else
                 {
-                    nextWord = ReadToNextWhiteSpace();
+                    nextWord = ReadToNextSpecialCharacterOrWhiteSpace();
                 }
                 AddToken(nextWord);
             }
@@ -61,7 +70,6 @@ namespace BudgetCLI.Scanner
             {
                 result = new ReservedWordToken(word, (ReservedWordEnum)reservedWord);
             }
-            
 
             if (result == null)
             {
@@ -73,10 +81,20 @@ namespace BudgetCLI.Scanner
             }
         }
 
-        public string ReadToNextWhiteSpace()
+        public string ReadWordWithLeadingComparator()
+        {
+            string result = RawString[CurrentIndex - 1].ToString();
+            if (CurrentIndex < RawString.Length && PeekChar() == '=')
+            {
+                result += ReadChar();
+            }
+            return result;
+        }
+
+        public string ReadToNextSpecialCharacterOrWhiteSpace()
         {
             string result = RawString[CurrentIndex - 1].ToString(); // start of word was the last read character
-            while (CurrentIndex < RawString.Length && !char.IsWhiteSpace(PeekChar()))
+            while (CurrentIndex < RawString.Length && !SpecialCharacters.Contains(PeekChar()) && !char.IsWhiteSpace(PeekChar()))
             {
                 result += ReadChar();
             }
