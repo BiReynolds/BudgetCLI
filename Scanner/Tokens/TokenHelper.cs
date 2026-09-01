@@ -2,26 +2,22 @@ namespace BudgetCLI.Scanner.Tokens
 {
     public static class TokenHelper
     {
-        static Dictionary<string, BudgetMainCommandEnum> StringToCommandDict = new()
+        static Dictionary<string, ReservedWordEnum> StringToReservedWord = new()
         {
-            {"exit", BudgetMainCommandEnum.EXIT},
-            {"show", BudgetMainCommandEnum.SHOW},
-            {"add", BudgetMainCommandEnum.ADD},
-            {"delete", BudgetMainCommandEnum.DELETE},
-            {"paid", BudgetMainCommandEnum.PAID},
-            {"unpaid", BudgetMainCommandEnum.UNPAID},
-            {"edit", BudgetMainCommandEnum.EDIT},
-            {"save", BudgetMainCommandEnum.SAVE},
-            {"reset", BudgetMainCommandEnum.RESET},
-        };
-
-        static Dictionary<string, SubCommandEnum> StringToSubCommandDict = new()
-        {
-            {"bill", SubCommandEnum.BILL},
-            {"bills", SubCommandEnum.BILLS},
-            {"name", SubCommandEnum.NAME},
-            {"amount", SubCommandEnum.AMOUNT},
-            {"duedate", SubCommandEnum.DUE_DATE}
+            {"exit", ReservedWordEnum.EXIT},
+            {"show", ReservedWordEnum.SHOW},
+            {"add", ReservedWordEnum.ADD},
+            {"delete", ReservedWordEnum.DELETE},
+            {"paid", ReservedWordEnum.PAID},
+            {"unpaid", ReservedWordEnum.UNPAID},
+            {"edit", ReservedWordEnum.EDIT},
+            {"save", ReservedWordEnum.SAVE},
+            {"reset", ReservedWordEnum.RESET},
+            {"bill", ReservedWordEnum.BILL},
+            {"bills", ReservedWordEnum.BILLS},
+            {"name", ReservedWordEnum.NAME},
+            {"amount", ReservedWordEnum.AMOUNT},
+            {"duedate", ReservedWordEnum.DUE_DATE}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)
@@ -127,31 +123,16 @@ namespace BudgetCLI.Scanner.Tokens
             return true;
         }
 
-        public static bool TryGetCommandType(string tokenString, out BudgetMainCommandEnum? mainCommandToken)
+        public static bool TryGetReservedWord(string tokenString, out ReservedWordEnum? ReservedWordEnum)
         {
-            BudgetMainCommandEnum result;
-            if (StringToCommandDict.TryGetValue(tokenString.ToLower(), out result))
+            if (StringToReservedWord.TryGetValue(tokenString.ToLower(), out ReservedWordEnum result))
             {
-                mainCommandToken = result;
+                ReservedWordEnum = result;
                 return true;
             }
             else
             {
-                mainCommandToken = null;
-                return false;
-            }
-        }
-
-        public static bool TryGetSubCommand(string tokenString, out SubCommandEnum? subCommandEnum)
-        {
-            if (StringToSubCommandDict.TryGetValue(tokenString.ToLower(), out SubCommandEnum result))
-            {
-                subCommandEnum = result;
-                return true;
-            }
-            else
-            {
-                subCommandEnum = null;
+                ReservedWordEnum = null;
                 return false;
             }
         }

@@ -4,7 +4,7 @@ namespace BudgetCLI.Exceptions
 {
     public class ExpectedSubCommandException : Exception
     {
-        public ExpectedSubCommandException(BudgetMainCommandEnum mainCommandEnum) :
+        public ExpectedSubCommandException(ReservedWordEnum mainCommandEnum) :
         base($"{mainCommandEnum} expects a subcommand") {}
     }
 }

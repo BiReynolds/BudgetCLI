@@ -57,13 +57,9 @@ namespace BudgetCLI.Scanner
             {
                 result = dateResult;
             }
-            else if (TokenHelper.TryGetSubCommand(word, out SubCommandEnum? subCommandType))
+            else if (TokenHelper.TryGetReservedWord(word, out ReservedWordEnum? reservedWord) && reservedWord != null)
             {
-                result = new SubCommandToken(word, (SubCommandEnum)subCommandType);
-            }
-            else if (TokenHelper.TryGetCommandType(word, out BudgetMainCommandEnum? mainCommandType))
-            {
-                result = new MainCommandToken(word, (BudgetMainCommandEnum)mainCommandType);
+                result = new ReservedWordToken(word, (ReservedWordEnum)reservedWord);
             }
             
 

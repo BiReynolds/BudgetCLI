@@ -18,24 +18,24 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
 
         public OutputTokenBase EvaluateShowCommand(List<BudgetTokenBase> remainingTokens)
         {
-            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
-                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
-                switch (subCommandToken.SubCommandType)
+                ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
+                switch (ReservedWordToken.ReservedWord)
                 {
-                    case SubCommandEnum.BILL:
+                    case ReservedWordEnum.BILL:
                         return EvaluateShowBillCommand(remainingTokens[1..]);
-                    case SubCommandEnum.BILLS:
+                    case ReservedWordEnum.BILLS:
                         GetShowBillsArgs(remainingTokens[1..]);
                         IEnumerable<OneTimeBillModel> allActiveBills = FilterHelper.FilterByDeleted(Session.SessionBillList, false);
                         return new OneTimeBillList(allActiveBills);
                     default:
-                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.SHOW, subCommandToken.SubCommandType);
+                        throw new SubCommandNotSupportedException(ReservedWordEnum.SHOW, ReservedWordToken.ReservedWord);
                 }
             }
             else
             {
-                throw new ExpectedSubCommandException(BudgetMainCommandEnum.SHOW);
+                throw new ExpectedSubCommandException(ReservedWordEnum.SHOW);
             }
         }
 

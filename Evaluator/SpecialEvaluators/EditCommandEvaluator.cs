@@ -16,34 +16,34 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
         }
         public OutputTokenBase EvaluateEditCommand(List<BudgetTokenBase> remainingTokens)
         {
-            SubCommandToken editedObjectType = (SubCommandToken)remainingTokens[0];
-            switch (editedObjectType.SubCommandType)
+            ReservedWordToken editedObjectType = (ReservedWordToken)remainingTokens[0];
+            switch (editedObjectType.ReservedWord)
             {
-                case SubCommandEnum.BILL:
+                case ReservedWordEnum.BILL:
                     return EvaluateEditBillCommand(remainingTokens[1..]);
                 default:
-                    throw new SubCommandNotSupportedException(BudgetMainCommandEnum.EDIT, editedObjectType.SubCommandType);
+                    throw new SubCommandNotSupportedException(ReservedWordEnum.EDIT, editedObjectType.ReservedWord);
             }
         }
         OutputTokenBase EvaluateEditBillCommand(List<BudgetTokenBase> remainingTokens)
         {
             EditBillCommandArgTypeCheck(remainingTokens);
             OneTimeBillModel model = EvaluateHelper.GetBillFromArgs(remainingTokens[0..1], Session);
-            SubCommandToken editedField = (SubCommandToken)remainingTokens[1];
+            ReservedWordToken editedField = (ReservedWordToken)remainingTokens[1];
             SimpleTextOutput result;
-            switch (editedField.SubCommandType)
+            switch (editedField.ReservedWord)
             {
-                case SubCommandEnum.NAME:
+                case ReservedWordEnum.NAME:
                     StringToken newNameToken = (StringToken)remainingTokens[2];
                     result = new($"Bill {model.Name} has been renamed to {newNameToken.Value}");
                     model.Name = newNameToken.Value;
                     return result;
-                case SubCommandEnum.AMOUNT:
+                case ReservedWordEnum.AMOUNT:
                     NumberToken newAmountToken = (NumberToken)remainingTokens[2];
                     result = new($"Bill {model.Name} amount changed from {model.Amount} to {newAmountToken.Value}");
                     model.Amount = newAmountToken.Value;
                     return result;
-                case SubCommandEnum.DUE_DATE:
+                case ReservedWordEnum.DUE_DATE:
                     DateToken newDateToken = (DateToken)remainingTokens[2];
                     result = new($"Bill {model.Name} due date changed from {model.DueDate} to {newDateToken.Value}");
                     model.DueDate = newDateToken.Value;
@@ -60,9 +60,9 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
             {
                 throw new WrongNumberOfArgumentsException(remainingTokens.Count, 3);
             }
-            if (remainingTokens[1].TokenType != BudgetTokenEnum.SUB_COMMAND)
+            if (remainingTokens[1].TokenType != BudgetTokenEnum.RESERVED_WORD)
             {
-                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.SUB_COMMAND);
+                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.RESERVED_WORD);
             }
             List<BudgetTokenEnum> acceptedTypes = [BudgetTokenEnum.NUMBER, BudgetTokenEnum.STRING, BudgetTokenEnum.DATE];
             if (!acceptedTypes.Contains(remainingTokens[2].TokenType))

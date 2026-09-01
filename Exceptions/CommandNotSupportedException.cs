@@ -4,7 +4,7 @@ namespace BudgetCLI.Exceptions
 {
     public class CommandNotSupportedException : Exception
     {
-        public CommandNotSupportedException(MainCommandToken commandToken) : 
-        base($"This evaluator does not support tokens of type {commandToken.CommandType}") { } 
+        public CommandNotSupportedException(ReservedWordToken commandToken) : 
+        base($"This evaluator does not support tokens of type {commandToken.ReservedWord}") { } 
     }
 }

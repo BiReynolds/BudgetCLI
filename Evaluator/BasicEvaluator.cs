@@ -30,33 +30,33 @@ namespace BudgetCLI.Evaluator
                 throw new Exception("Session data is null at Evaluate - did you call SetSessionData?");
             }
             BudgetTokenBase firstToken = tokens[0];
-            if (firstToken.TokenType != BudgetTokenEnum.MAIN_COMMAND)
+            if (firstToken.TokenType != BudgetTokenEnum.RESERVED_WORD)
             {
                 throw new NoLeadingCommandException(firstToken);
             }
-            if (firstToken is not MainCommandToken commandToken)
+            if (firstToken is not ReservedWordToken commandToken)
             {
-                throw new TokenTypeMismatchException(BudgetTokenEnum.MAIN_COMMAND, typeof(MainCommandToken));
+                throw new TokenTypeMismatchException(BudgetTokenEnum.RESERVED_WORD, typeof(ReservedWordToken));
             }
-            switch (commandToken.CommandType)
+            switch (commandToken.ReservedWord)
             {
-                case BudgetMainCommandEnum.EXIT:
+                case ReservedWordEnum.EXIT:
                     return EvaluateExitCommand();
-                case BudgetMainCommandEnum.SHOW:
+                case ReservedWordEnum.SHOW:
                     return ShowCommandEvaluator.EvaluateShowCommand(tokens[1..]);
-                case BudgetMainCommandEnum.ADD:
+                case ReservedWordEnum.ADD:
                     return EvaluateAddCommand(tokens[1..]);
-                case BudgetMainCommandEnum.DELETE:
+                case ReservedWordEnum.DELETE:
                     return EvaluateDeleteCommand(tokens[1..]);
-                case BudgetMainCommandEnum.PAID:
+                case ReservedWordEnum.PAID:
                     return EvaluatePaidCommand(tokens[1..]);
-                case BudgetMainCommandEnum.UNPAID:
+                case ReservedWordEnum.UNPAID:
                     return EvaluateUnpaidCommand(tokens[1..]);
-                case BudgetMainCommandEnum.EDIT:
+                case ReservedWordEnum.EDIT:
                     return EditCommandEvaluator.EvaluateEditCommand(tokens[1..]);
-                case BudgetMainCommandEnum.SAVE:
+                case ReservedWordEnum.SAVE:
                     return EvaluateSaveCommand();
-                case BudgetMainCommandEnum.RESET:
+                case ReservedWordEnum.RESET:
                     return EvaluateResetCommand();
                 default:
                     throw new CommandNotSupportedException(commandToken);
@@ -79,23 +79,23 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)
         {
-            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
-                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
-                switch (subCommandToken.SubCommandType)
+                ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
+                switch (ReservedWordToken.ReservedWord)
                 {
-                    case SubCommandEnum.BILL:
+                    case ReservedWordEnum.BILL:
                         GetAddBillArgs(remainingTokens[1..], out string name, out decimal amount, out DateOnly dueDate);
                         OneTimeBillModel model = new(name, amount, dueDate, false);
                         Session.AddNewOneTimeBill(model);
                         return new SimpleTextOutput($"Bill {name} added");
                     default:
-                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.ADD, subCommandToken.SubCommandType);
+                        throw new SubCommandNotSupportedException(ReservedWordEnum.ADD, ReservedWordToken.ReservedWord);
                 }
             }
             else
             {
-                throw new ExpectedSubCommandException(BudgetMainCommandEnum.ADD);
+                throw new ExpectedSubCommandException(ReservedWordEnum.ADD);
             }
         }
 
@@ -124,12 +124,12 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateDeleteCommand(List<BudgetTokenBase> remainingTokens)
         {
-            if (remainingTokens[0].TokenType == BudgetTokenEnum.SUB_COMMAND)
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
-                SubCommandToken subCommandToken = remainingTokens[0] as SubCommandToken;
-                switch (subCommandToken.SubCommandType)
+                ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
+                switch (ReservedWordToken.ReservedWord)
                 {
-                    case SubCommandEnum.BILL:
+                    case ReservedWordEnum.BILL:
                         GetDeleteBillArgs(remainingTokens[1..], out int billId);
                         bool didDelete = Session.DeleteOneTimeBillById(billId);
                         if (didDelete)
@@ -141,12 +141,12 @@ namespace BudgetCLI.Evaluator
                             return new SimpleTextOutput($"no change made - no bill found with id {billId}");
                         }
                     default:
-                        throw new SubCommandNotSupportedException(BudgetMainCommandEnum.DELETE, subCommandToken.SubCommandType);
+                        throw new SubCommandNotSupportedException(ReservedWordEnum.DELETE, ReservedWordToken.ReservedWord);
                 }
             }
             else
             {
-                throw new ExpectedSubCommandException(BudgetMainCommandEnum.ADD);
+                throw new ExpectedSubCommandException(ReservedWordEnum.ADD);
             }
         }
 
