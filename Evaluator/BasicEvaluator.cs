@@ -5,8 +5,7 @@ using BudgetCLI.Evaluator.OutputTokens;
 using BudgetCLI.Exceptions;
 using BudgetCLI.Data.Models;
 using BudgetCLI.Session;
-using BudgetCLI.Evaluator.CommandHelpers;
-using BudgetCLI.Data;
+using BudgetCLI.Evaluator.SpecialEvaluators;
 
 namespace BudgetCLI.Evaluator 
 {
@@ -15,10 +14,13 @@ namespace BudgetCLI.Evaluator
         public event EventHandler? SafeExitEvent;
         public event EventHandler? UnsavedChangesExitEvent;
         SessionManager? Session;
-
+        ShowCommandEvaluator? ShowCommandEvaluator;
+        EditCommandEvaluator? EditCommandEvaluator;
         public void SetSessionData(SessionManager session)
         {
             Session = session;
+            ShowCommandEvaluator = new(session);
+            EditCommandEvaluator = new(session);
         }
 
         public OutputTokenBase Evaluate(List<BudgetTokenBase> tokens)
@@ -41,7 +43,7 @@ namespace BudgetCLI.Evaluator
                 case BudgetMainCommandEnum.EXIT:
                     return EvaluateExitCommand();
                 case BudgetMainCommandEnum.SHOW:
-                    return ShowCommandHelper.EvaluateShowCommand(tokens[1..], Session);
+                    return ShowCommandEvaluator.EvaluateShowCommand(tokens[1..]);
                 case BudgetMainCommandEnum.ADD:
                     return EvaluateAddCommand(tokens[1..]);
                 case BudgetMainCommandEnum.DELETE:
@@ -51,7 +53,7 @@ namespace BudgetCLI.Evaluator
                 case BudgetMainCommandEnum.UNPAID:
                     return EvaluateUnpaidCommand(tokens[1..]);
                 case BudgetMainCommandEnum.EDIT:
-                    return EvaluateEditCommand(tokens[1..]);
+                    return EditCommandEvaluator.EvaluateEditCommand(tokens[1..]);
                 case BudgetMainCommandEnum.SAVE:
                     return EvaluateSaveCommand();
                 case BudgetMainCommandEnum.RESET:
@@ -163,96 +165,18 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluatePaidCommand(List<BudgetTokenBase> remainingTokens)
         {
-            OneTimeBillModel model = GetBillFromArgs(remainingTokens);
+            OneTimeBillModel model = EvaluateHelper.GetBillFromArgs(remainingTokens, Session);
             model.IsPaid = true;
             return new SimpleTextOutput($"Marked {model.Name} as paid");
         }
 
         OutputTokenBase EvaluateUnpaidCommand(List<BudgetTokenBase> remainingTokens)
         {
-            OneTimeBillModel model = GetBillFromArgs(remainingTokens);
+            OneTimeBillModel model = EvaluateHelper.GetBillFromArgs(remainingTokens, Session);
             model.IsPaid = false;
             return new SimpleTextOutput($"Marked {model.Name} as unpaid");
         }
 
-        OutputTokenBase EvaluateEditCommand(List<BudgetTokenBase> remainingTokens)
-        {
-            EditCommandArgTypeCheck(remainingTokens);
-            OneTimeBillModel model = GetBillFromArgs(remainingTokens[0..1]);
-            SubCommandToken editedField = (SubCommandToken)remainingTokens[1];
-            SimpleTextOutput result;
-            switch (editedField.SubCommandType)
-            {
-                case SubCommandEnum.NAME:
-                    StringToken newNameToken = (StringToken)remainingTokens[2];
-                    result = new($"Bill {model.Name} has been renamed to {newNameToken.Value}");
-                    model.Name = newNameToken.Value;
-                    return result;
-                case SubCommandEnum.AMOUNT:
-                    NumberToken newAmountToken = (NumberToken)remainingTokens[2];
-                    result = new($"Bill {model.Name} amount changed from {model.Amount} to {newAmountToken.Value}");
-                    model.Amount = newAmountToken.Value;
-                    return result;
-                case SubCommandEnum.DUE_DATE:
-                    DateToken newDateToken = (DateToken)remainingTokens[2];
-                    result = new($"Bill {model.Name} due date changed from {model.DueDate} to {newDateToken.Value}");
-                    model.DueDate = newDateToken.Value;
-                    return result;
-                default:
-                    // shouldn't be possible due to EditCommandArgType check, but whatever
-                    throw new UnexpectedArgTypeException(remainingTokens[2], [BudgetTokenEnum.NUMBER, BudgetTokenEnum.STRING, BudgetTokenEnum.DATE]);
-            }
-        }
-
-        void EditCommandArgTypeCheck(List<BudgetTokenBase> remainingTokens)
-        {
-            if (remainingTokens.Count != 3)
-            {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 3);
-            }
-            if (remainingTokens[1].TokenType != BudgetTokenEnum.SUB_COMMAND)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.SUB_COMMAND);
-            }
-            List<BudgetTokenEnum> acceptedTypes = [BudgetTokenEnum.NUMBER, BudgetTokenEnum.STRING, BudgetTokenEnum.DATE];
-            if (!acceptedTypes.Contains(remainingTokens[2].TokenType))
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[2], acceptedTypes);
-            }
-        }
-
-        OneTimeBillModel GetBillFromArgs(List<BudgetTokenBase> remainingTokens)
-        {
-            // Exact same method as "ShowCommandHelper.GetShownBillFromArgs," and will likely also be used for other commands... but will need a slight refactor of various methods
-            if (remainingTokens.Count != 1)
-            {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
-            }
-
-            OneTimeBillModel? result;
-            if (remainingTokens[0].TokenType == BudgetTokenEnum.NUMBER)
-            {
-                int billId = (int)((NumberToken)remainingTokens[0]).Value;
-                result = FilterHelper.GetById(Session.SessionBillList, billId);
-            }
-            else if (remainingTokens[0].TokenType == BudgetTokenEnum.STRING)
-            {
-                string billName = ((StringToken)remainingTokens[0]).Value;
-                result = FilterHelper.GetByName(Session.SessionBillList, billName);
-            }
-            else
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
-            }
-
-            if (result == null)
-            {
-                throw new Exception($"No bill in db with specified criteria");
-            }
-            else {
-                return result;
-            }
-        }
 
         OutputTokenBase EvaluateSaveCommand()
         {
