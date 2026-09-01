@@ -17,13 +17,13 @@
     - Syntax: `unpaid '[name]'`
     - Syntax: `unpaid [id]`
 - Edit existing bill by name or id
-    - [x] Syntax: `edit [name or id] [field] [newValue]`
-        - [x] Add necessary field tokens as subcommands (Name, Amount, DueDate)
+    - [x] Syntax: `edit bill [name or id] [field] [newValue]`
 
 ## In Progress
 ### Minimal Functionality
+- To add query logic below, will be helpful to refactor the scanner a bit.  Note that `paid` and `unpaid` will now serve different purposes based on where they appear in the command... Maybe combine commands / subcommands into a single 'reserved words' token type?  This will require a rather substantial refactor of the evaluator as well, but may be worth while in the long run
 - Add Query logic for `show` command
-    - [ ] Allow `unpaid` modifier
+    - [ ] Allow `unpaid` modifier (`show bills unpaid`)
     - [ ] Allow `due < before | after |  > < today | [date] >`
     - [ ] Allow `name contains '[queryString]'`
     - [ ] Allow `amount < <= | >= > [amount]`
