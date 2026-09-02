@@ -69,6 +69,10 @@ namespace BudgetCLI.Renderer
             {
                 Console.WriteLine($"Id: {modelDetails.Id}");
             }
+            if (modelDetails.ParentId != null)
+            {
+                Console.WriteLine($"ParentId : {modelDetails.ParentId}");
+            }
             Console.WriteLine($"Name : {modelDetails.Name}");
             Console.WriteLine($"Amount : {modelDetails.Amount}");
             Console.WriteLine($"Due Date : {modelDetails.DueDate}");

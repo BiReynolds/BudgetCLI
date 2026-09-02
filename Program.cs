@@ -32,5 +32,11 @@ namespace BudgetCLI
             BudgetEngine engine = new(Scanner, Evaluator, Renderer);
             engine.Start();
         }
+
+        public static void StartRun()
+        {
+            BudgetEngine engine = new(Scanner, Evaluator, Renderer);
+            engine.Start();
+        }
     }
 }

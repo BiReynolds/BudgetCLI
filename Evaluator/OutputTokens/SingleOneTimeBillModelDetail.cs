@@ -6,6 +6,7 @@ namespace BudgetCLI.Evaluator.OutputTokens
     public class SingleOneTimeBillModelDetail : OutputTokenBase
     {
         public int Id;
+        public int? ParentId;
         public string Name;
         public decimal Amount;
         public DateOnly DueDate;
@@ -13,6 +14,7 @@ namespace BudgetCLI.Evaluator.OutputTokens
         public SingleOneTimeBillModelDetail(OneTimeBillModel model) : base(OutputTokenEnum.SINGLE_ONE_TIME_BILL)
         {
             Id = model.Id;
+            ParentId = model.ParentId;
             Name = model.Name;
             Amount = model.Amount;
             DueDate = model.DueDate;

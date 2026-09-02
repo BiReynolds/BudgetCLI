@@ -25,13 +25,14 @@ namespace BudgetCLI.Data
         {
             SqliteCommand command = connection.CreateCommand();
             command.CommandText = """
-                INSERT INTO OneTimeBills (Name, Amount, DueDate, IsPaid)
-                VALUES ($name, $amount, $dueDate, $isPaid);
+                INSERT INTO OneTimeBills (Name, Amount, DueDate, IsPaid, ParentId)
+                VALUES ($name, $amount, $dueDate, $isPaid, $parentId);
             """;
             command.Parameters.AddWithValue("$name", newBill.Name);
             command.Parameters.AddWithValue("$amount", newBill.Amount);
             command.Parameters.AddWithValue("$dueDate", newBill.DueDate);
             command.Parameters.AddWithValue("$isPaid", newBill.IsPaid);
+            command.Parameters.AddWithValue("$parentId", newBill.ParentId);
             command.ExecuteNonQuery();
         }
 
@@ -51,7 +52,8 @@ namespace BudgetCLI.Data
                     reader.GetString(1),
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
-                    reader.GetBoolean(4)
+                    reader.GetBoolean(4),
+                    reader.GetInt16(5)
                 );
             }
             else
@@ -76,7 +78,8 @@ namespace BudgetCLI.Data
                     reader.GetString(1),
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
-                    reader.GetBoolean(4)
+                    reader.GetBoolean(4),
+                    reader.GetInt16(5)
                 );
             }
             else
@@ -95,12 +98,22 @@ namespace BudgetCLI.Data
             List<OneTimeBillModel> result = new();
             while (reader.Read())
             {
+                int? parentId;
+                if (reader.IsDBNull(5))
+                {
+                    parentId = null;
+                }
+                else
+                {
+                    parentId = reader.GetInt16(5);
+                }
                 result.Add(new OneTimeBillModel(
                     reader.GetInt16(0),
                     reader.GetString(1),
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
-                    reader.GetBoolean(4)
+                    reader.GetBoolean(4),
+                    parentId
                 ));
             }
             return result;

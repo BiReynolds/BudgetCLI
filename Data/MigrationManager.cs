@@ -8,7 +8,8 @@ namespace BudgetCLI.Data
         static string MigrationScriptsPath = "./Data/MigrationScripts/";
         static OrderedDictionary<string, string> DBVersionStringToMigrationScript = new()
         {
-            {"0.1", "CreateOneTimeBillsTable.sql"}
+            {"0.1", "CreateOneTimeBillsTable.sql"},
+            {"0.2", "CreateRecurringBillsTable.sql"}
         };
         SqliteConnection Connection;
         AppInfoModel AppInfo = new();
@@ -26,6 +27,7 @@ namespace BudgetCLI.Data
             {
                 ReadAndRunSqlScript("BudgetDatabaseCreation.sql");
             }
+            UpdateLastOpened();
             GetAppInfo();
             Migrate();
             Connection.Close();
@@ -71,7 +73,7 @@ namespace BudgetCLI.Data
                         AppInfo.DatabaseVersion = reader.GetString(1);
                         break;
                     case "LastUpdate":
-                        AppInfo.LastUpdate = DateOnly.FromDateTime(reader.GetDateTime(1));
+                        AppInfo.LastUpdated = DateOnly.FromDateTime(reader.GetDateTime(1));
                         break;
                     case "LastOpened":
                         AppInfo.LastOpened = DateOnly.FromDateTime(reader.GetDateTime(1));
@@ -80,15 +82,46 @@ namespace BudgetCLI.Data
             }
         }
 
+        void UpdateLastOpened()
+        {
+            SqliteCommand command = Connection.CreateCommand();
+            command.CommandText = """
+                UPDATE AppInfo
+                SET InfoValue = $today
+                WHERE InfoKey = 'LastOpened';
+            """;
+            command.Parameters.AddWithValue("$today", DateOnly.FromDateTime(DateTime.Today));
+            command.ExecuteNonQuery();
+        }
+
+        void UpdateLastUpdated()
+        {
+            SqliteCommand command = Connection.CreateCommand();
+            command.CommandText = """
+                UPDATE AppInfo
+                SET InfoValue = $today
+                WHERE InfoKey = 'LastUpdated';
+            """;
+            command.Parameters.AddWithValue("$today", DateOnly.FromDateTime(DateTime.Today));
+            command.ExecuteNonQuery();
+        }
+
         void Migrate()
         {
+            bool didMigrate = false;
             foreach (string dbVersionString in DBVersionStringToMigrationScript.Keys)
             {
                 if (string.Compare(AppInfo.DatabaseVersion, dbVersionString) < 0)
                 {
+                    didMigrate = true;
                     ReadAndRunSqlScript(DBVersionStringToMigrationScript[dbVersionString]);
                     AppInfo.DatabaseVersion = dbVersionString;
                 }
+            }
+
+            if (didMigrate)
+            {
+                UpdateLastUpdated();
             }
         }
 

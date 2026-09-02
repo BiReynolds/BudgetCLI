@@ -3,6 +3,7 @@ namespace BudgetCLI.Data.Models
     public class OneTimeBillModel
     {
         public event EventHandler? OneTimeBillModelChanged;
+        public int? ParentId { get; private set; }
         public bool IsDeleted { get; set; }
         public bool IsChanged { 
             get; 
@@ -77,23 +78,37 @@ namespace BudgetCLI.Data.Models
             Amount = amount;
             DueDate = dueDate;
             IsPaid = isPaid;
+            ParentId = null;
         }
-        public OneTimeBillModel(int id, string name, decimal amount, DateOnly dueDate, bool isPaid)
+
+        public OneTimeBillModel(string name, decimal amount, DateOnly dueDate, bool isPaid, int parentId)
+        {
+            Id = -1;
+            Name = name;
+            Amount = amount;
+            DueDate = dueDate;
+            IsPaid = isPaid;
+            ParentId = parentId;
+        }
+
+        public OneTimeBillModel(int id, string name, decimal amount, DateOnly dueDate, bool isPaid, int? parentId)
         {
             Id = id;
             Name = name;
             Amount = amount;
             DueDate = dueDate;
             IsPaid = isPaid;
+            ParentId = parentId;
         }
 
         public override string ToString()
         {
-            string result = $"Id: {Id}\n";
-            result += $"Name: {Name}\n";
-            result += $"Amount: {Amount}\n";
-            result += $"DueDate: {DueDate}\n";
-            result += $"IsPaid: {IsPaid}";
+            string result = $"Id: {Id}";
+            result += $"\nParent Id: {ParentId}";
+            result += $"\nName: {Name}";
+            result += $"\nAmount: {Amount}";
+            result += $"\nDueDate: {DueDate}";
+            result += $"\nIsPaid: {IsPaid}";
             return result;
         }
 
