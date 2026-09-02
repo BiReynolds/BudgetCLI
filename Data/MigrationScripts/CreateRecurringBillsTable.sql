@@ -7,7 +7,8 @@ CREATE TABLE RecurringBills (
     StartDate TEXT NOT NULL,
     EndDate TEXT,
     RecurringType INTEGER NOT NULL,
-    ReferenceDate TEXT NOT NULL
+    ReferenceDate TEXT NOT NULL,
+    LastOneTimeDueDateAdded TEXT
 );
 
 -- worth noting that we could add the ParentId column as a Foreign Key, but sqlite does not support addition of foreign keys to existing tables

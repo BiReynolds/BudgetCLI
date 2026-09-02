@@ -9,13 +9,13 @@ namespace BudgetCLI.Data
         static OrderedDictionary<string, string> DBVersionStringToMigrationScript = new()
         {
             {"0.1", "CreateOneTimeBillsTable.sql"},
-            {"0.2", "CreateRecurringBillsTable.sql"}
+            {"0.2", "CreateRecurringBillsTable.sql"},
+            {"0.3", "CreateBudgetJobsTable.sql"}
         };
         SqliteConnection Connection;
         AppInfoModel AppInfo = new();
         public MigrationManager()
         {
-            Console.WriteLine("Initializing MigrationManager");
             Connection = DatabaseHelper.GetReadWriteConnection();
         }
 

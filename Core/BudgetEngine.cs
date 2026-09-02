@@ -1,6 +1,7 @@
 using BudgetCLI.Core.Objects;
 using BudgetCLI.Core.Interfaces;
 using BudgetCLI.Session;
+using BudgetCLI.Jobs;
 
 namespace BudgetCLI.Core
 {
@@ -12,13 +13,16 @@ namespace BudgetCLI.Core
         IRenderer Renderer;
         string CurrentInput = "";
         List<BudgetTokenBase> CurrentScannedTokens = [];
-        SessionManager Session = new();
+        SessionManager Session;
+        JobManager JobManager;
         OutputTokenBase? CurrentOutput;
         public BudgetEngine(IScanner scanner, IEvaluator evaluator, IRenderer renderer)
         {
             Scanner = scanner;
             Evaluator = evaluator;
             Renderer = renderer;
+            Session = new();
+            JobManager = new(Session);
         }
 
         public void Start()
@@ -62,19 +66,23 @@ namespace BudgetCLI.Core
 
         public virtual void InitActions()
         {
+            // Console.WriteLine("Initializing Session");
             Session.InitSession();
+            // Console.WriteLine("Handling Jobs");
+            JobManager.HandleJobs();
 
+            // Console.WriteLine("Setting session data");
             Evaluator.SetSessionData(Session);
             Evaluator.SafeExitEvent += (o, e) =>
             {
                 Running = false;
             };
-            Console.WriteLine("starting program");
+            Console.WriteLine("Budget program started");
         }
 
         public virtual void ExitActions()
         {
-            Console.WriteLine("stopping program");
+            Console.WriteLine("Budget program closed successfully");
         }
     }
 }

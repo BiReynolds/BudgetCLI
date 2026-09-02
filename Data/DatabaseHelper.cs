@@ -1,6 +1,5 @@
 using Microsoft.Data.Sqlite;
 using BudgetCLI.Data.Models;
-using System.Data.Common;
 
 namespace BudgetCLI.Data
 {
@@ -34,15 +33,39 @@ namespace BudgetCLI.Data
             command.Parameters.AddWithValue("$amount", newBill.Amount);
             command.Parameters.AddWithValue("$dueDate", newBill.DueDate);
             command.Parameters.AddWithValue("$isPaid", newBill.IsPaid);
-            if (newBill.ParentId == null)
-            {
-                command.Parameters.AddWithValue("$parentId", DBNull.Value);
-            }
-            else
-            {
-                command.Parameters.AddWithValue("$parentId", newBill.ParentId);
-            }
+            AddParameterWithNullableValueToCommand(command, "$parentId", newBill.ParentId);
             command.ExecuteNonQuery();
+        }
+
+        public static void AddManyOneTimeBillsToDatabase(IEnumerable<OneTimeBillModel> newBills, SqliteConnection connection)
+        {
+            // Per Microsoft docs, best practice for bulk insertion is to use a transaction and reuse the same parametrized command rather than a new command for each row
+            using (var transaction = connection.BeginTransaction())
+            {
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText = """
+                    INSERT INTO OneTimeBills (Name, Amount, DueDate, IsPaid, ParentId)
+                    VALUES ($name, $amount, $dueDate, $isPaid, $parentId)
+                """;
+
+                var nameParameter = CreateParameterAndAddToCommand("$name", command);
+                var amountParameter = CreateParameterAndAddToCommand("$amount", command);
+                var dueDateParameter = CreateParameterAndAddToCommand("$dueDate", command);
+                var isPaidParameter = CreateParameterAndAddToCommand("$isPaid", command);
+                var parentIdParameter = CreateParameterAndAddToCommand("$parentId", command);
+
+                foreach (OneTimeBillModel bill in newBills)
+                {
+                    nameParameter.Value = bill.Name;
+                    amountParameter.Value = bill.Amount;
+                    dueDateParameter.Value = bill.DueDate;
+                    isPaidParameter.Value = bill.IsPaid;
+                    parentIdParameter.Value = bill.ParentId;
+                    command.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
         }
 
         public static OneTimeBillModel? GetOneTimeBillById(int id, SqliteConnection connection)
@@ -165,23 +188,16 @@ namespace BudgetCLI.Data
         {
             SqliteCommand command = connection.CreateCommand();
             command.CommandText = """
-                INSERT INTO RecurringBills (Name, Amount, StartDate, EndDate, RecurringType, ReferenceDate)
-                VALUES ($name, $amount, $startDate, $endDate, $recurringType, $referenceDate);
+                INSERT INTO RecurringBills (Name, Amount, StartDate, EndDate, RecurringType, ReferenceDate, LastOneTimeDueDateAdded)
+                VALUES ($name, $amount, $startDate, $endDate, $recurringType, $referenceDate, $lastOneTimeDueDateAdded);
             """;
             command.Parameters.AddWithValue("$name", model.Name);
             command.Parameters.AddWithValue("$amount", model.Amount);
             command.Parameters.AddWithValue("$startDate", model.StartDate);
-            command.Parameters.AddWithValue("$endDate", model.EndDate);
+            AddParameterWithNullableValueToCommand(command, "$endDate", model.EndDate);
             command.Parameters.AddWithValue("$recurringType", model.RecurringType);
             command.Parameters.AddWithValue("$referenceDate", model.ReferenceDate);
-            if (model.EndDate == null)
-            {
-                command.Parameters.AddWithValue("$endDate", DBNull.Value);
-            }
-            else
-            {
-                command.Parameters.AddWithValue("$endDate", model.EndDate);
-            }
+            AddParameterWithNullableValueToCommand(command, "$lastOneTimeDueDateAdded", model.LastOneTimeDueDateAdded);
             command.ExecuteNonQuery();
         }
 
@@ -197,23 +213,15 @@ namespace BudgetCLI.Data
             SqliteDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                DateOnly? endDate;
-                if (reader.IsDBNull(4))
-                {
-                    endDate = null;
-                }
-                else
-                {
-                    endDate = DateOnly.FromDateTime(reader.GetDateTime(4));
-                }
                 return new RecurringBillModel(
                     reader.GetInt16(0),
                     reader.GetString(1),
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
-                    endDate,
+                    GetNullableValueFromReader(reader, (r, i) => DateOnly.FromDateTime(r.GetDateTime(i)), 4),
                     (RecurringTypeEnum)reader.GetInt16(5),
-                    DateOnly.FromDateTime(reader.GetDateTime(6))
+                    DateOnly.FromDateTime(reader.GetDateTime(6)),
+                    GetNullableValueFromReader(reader, (r, i) => DateOnly.FromDateTime(r.GetDateTime(i)), 7)
                 );
             }
             else
@@ -233,26 +241,81 @@ namespace BudgetCLI.Data
             List<RecurringBillModel> result = new();
             while (reader.Read())
             {
-                DateOnly? endDate;
-                if (reader.IsDBNull(4))
-                {
-                    endDate = null;
-                }
-                else
-                {
-                    endDate = DateOnly.FromDateTime(reader.GetDateTime(4));
-                }
                 result.Add(new RecurringBillModel(
                     reader.GetInt16(0),
                     reader.GetString(1),
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
-                    endDate,
+                    GetNullableValueFromReader(reader, (r, i) => DateOnly.FromDateTime(r.GetDateTime(i)), 4),
                     (RecurringTypeEnum)reader.GetInt16(5),
-                    DateOnly.FromDateTime(reader.GetDateTime(6))
+                    DateOnly.FromDateTime(reader.GetDateTime(6)),
+                    GetNullableValueFromReader(reader, (r, i) => DateOnly.FromDateTime(r.GetDateTime(i)), 7)
                 ));
             }
             return result;
+        }
+        public static List<BudgetJobModel> GetAllJobsFromDatabase(SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT Name, LastRunDate FROM BudgetJobs;
+            """;
+
+            List<BudgetJobModel> result = new();
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                result.Add(new BudgetJobModel(
+                    reader.GetString(0),
+                    GetNullableValueFromReader(reader, (r, i) => DateOnly.FromDateTime(r.GetDateTime(i)), 1)
+                ));
+            }
+            return result;
+        }
+
+        public static void MarkJobComplete(string jobName, SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                UPDATE BudgetJobs
+                SET LastRunDate = $today
+                WHERE Name = $jobName
+            """;
+            command.Parameters.AddWithValue("$today", DateOnly.FromDateTime(DateTime.Today));
+            command.Parameters.AddWithValue("$jobName", jobName);
+            command.ExecuteNonQuery();
+        }
+
+        static SqliteParameter CreateParameterAndAddToCommand(string parameterName, SqliteCommand command)
+        {
+            SqliteParameter result = command.CreateParameter();
+            result.ParameterName = parameterName;
+            command.Parameters.Add(result);
+            return result;
+        }
+
+        static void AddParameterWithNullableValueToCommand(SqliteCommand command, string parameterName, object? nullableValue)
+        {
+            if (nullableValue == null)
+            {
+                command.Parameters.AddWithValue(parameterName, DBNull.Value);
+            }
+            else
+            {
+                command.Parameters.AddWithValue(parameterName, nullableValue);
+            }
+        }
+
+        static T? GetNullableValueFromReader<T>(SqliteDataReader reader, Func<SqliteDataReader, int, T> notNullSelector, int ordinal) where T : struct
+        {
+            if (reader.IsDBNull(ordinal)) 
+            {
+                return null;
+            }
+            else
+            {
+                return notNullSelector(reader, ordinal);
+            }
         }
     }
 }

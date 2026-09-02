@@ -126,16 +126,16 @@ namespace BudgetCLI.Evaluator
                 case ReservedWordEnum.PAID:
                 case ReservedWordEnum.UNPAID:
                     var booleanFilter = (BooleanFilterInfo)filter;
-                    return FilterHelper<OneTimeBillModel>.FilterDataWithBooleanFilter(data, x => x.IsPaid, booleanFilter);
+                    return FilterHelper.FilterDataWithBooleanFilter(data, x => x.IsPaid, booleanFilter);
                 case ReservedWordEnum.AMOUNT:
                     var numberFilter = (NumberFilterInfo)filter;
-                    return FilterHelper<OneTimeBillModel>.FilterDataWithNumberFilter(data, x => x.Amount, numberFilter);
+                    return FilterHelper.FilterDataWithNumberFilter(data, x => x.Amount, numberFilter);
                 case ReservedWordEnum.NAME:
                     var stringFilter = (StringFilterInfo)filter;
-                    return FilterHelper<OneTimeBillModel>.FilterDataWithStringFilter(data, x => x.Name, stringFilter);
+                    return FilterHelper.FilterDataWithStringFilter(data, x => x.Name, stringFilter);
                 case ReservedWordEnum.DUE_DATE:
                     var dateFilter = (DateFilterInfo)filter;
-                    return FilterHelper<OneTimeBillModel>.FilterDataWithDateFilter(data, x => x.DueDate, dateFilter);
+                    return FilterHelper.FilterDataWithDateFilter(data, x => x.DueDate, dateFilter);
                 default:
                     throw new FilterSyntaxError();
             }

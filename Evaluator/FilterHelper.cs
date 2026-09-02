@@ -6,9 +6,9 @@ using BudgetCLI.Scanner.Tokens;
 
 namespace BudgetCLI.Evaluator
 {
-    public static class FilterHelper<T>
+    public static class FilterHelper
     {
-        public static IEnumerable<T> FilterDataWithBooleanFilter(IEnumerable<T> data, Func<T, bool> selector, BooleanFilterInfo booleanFilter)
+        public static IEnumerable<T> FilterDataWithBooleanFilter<T>(IEnumerable<T> data, Func<T, bool> selector, BooleanFilterInfo booleanFilter)
         {
             switch (booleanFilter.ComparatorToken.ReservedWord)
             {
@@ -19,7 +19,7 @@ namespace BudgetCLI.Evaluator
             }
         }
 
-        public static IEnumerable<T> FilterDataWithNumberFilter(IEnumerable<T> data, Func<T, decimal> selector, NumberFilterInfo numberFilter)
+        public static IEnumerable<T> FilterDataWithNumberFilter<T>(IEnumerable<T> data, Func<T, decimal> selector, NumberFilterInfo numberFilter)
         {
             switch (numberFilter.ComparatorToken.ReservedWord)
             {
@@ -38,7 +38,7 @@ namespace BudgetCLI.Evaluator
             }
         }
 
-        public static IEnumerable<T> FilterDataWithStringFilter(IEnumerable<T> data, Func<T, string> selector, StringFilterInfo stringFilter)
+        public static IEnumerable<T> FilterDataWithStringFilter<T>(IEnumerable<T> data, Func<T, string> selector, StringFilterInfo stringFilter)
         {
             switch (stringFilter.ComparatorToken.ReservedWord)
             {
@@ -51,7 +51,7 @@ namespace BudgetCLI.Evaluator
             }
         }
 
-        public static IEnumerable<T> FilterDataWithDateFilter(IEnumerable<T> data, Func<T, DateOnly> selector, DateFilterInfo dateFilter)
+        public static IEnumerable<T> FilterDataWithDateFilter<T>(IEnumerable<T> data, Func<T, DateOnly> selector, DateFilterInfo dateFilter)
         {
             switch (dateFilter.ComparatorToken.ReservedWord)
             {

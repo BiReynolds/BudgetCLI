@@ -18,7 +18,7 @@ namespace BudgetCLI
         public static void Main()
         {
             MigrationManager.DoMigrations();
-            StartTestRun();
+            StartRun();
         }
 
         public static void RunTests()

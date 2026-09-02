@@ -34,9 +34,9 @@
 - [x] Edit RecurringBillModel to allow detection of changes (like the OneTimeBillModel )
 
 - [ ] Startup job which will add new occurrences of recurring bills on app open, if needed
-    - [ ] Add jobs table (might be overkill, but will be useful if we have other jobs we want to run later)
-    - [ ] Add column `RecurringBills.LastOneTimeDueDateAdded` which will keep track of the last instance of each recurring bill which was added to the db
-    - [ ] On startup, if JobLastRunTime < today, check each recurring bill's LastOneTimeDueDateAdded to see if another instance should exist between LastOneTimeDueDateAdded and today + 1 year.  If so, add it (or them, if multiple are needed)
+    - [x] Add jobs table (might be overkill, but will be useful if we have other jobs we want to run later)
+    - [x] Add column `RecurringBills.LastOneTimeDueDateAdded` which will keep track of the date of the last instance of each recurring bill which was added to the db
+    - [x] On startup, if JobLastRunTime < today, check each recurring bill's LastOneTimeDueDateAdded to see if another instance should exist between LastOneTimeDueDateAdded and today + 1 year.  If so, add it (or them, if multiple are needed)
 
 - [ ] Add Recurring Bill (and corresponding one-time instances)
     - [ ] Syntax: add recurring (name) (amount) (firstDue) (recurringType) (optional: endDate)

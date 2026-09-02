@@ -68,6 +68,12 @@ namespace BudgetCLI.Session
             SessionBillList.Add(billModel);
         }
 
+        public void AddManyOneTimeBills(IEnumerable<OneTimeBillModel> billModels)
+        {
+            UnsavedChanges = true;
+            SessionBillList.AddRange(billModels);
+        }
+
         public void DeleteOneTimeBill(OneTimeBillModel chosenBill)
         {
             chosenBill.IsDeleted = true;
