@@ -18,6 +18,8 @@ namespace BudgetCLI.Core.Objects
         ERROR_TEXT,
         SINGLE_ONE_TIME_BILL,
         ONE_TIME_BILL_LIST,
-        ERROR
+        ERROR,
+        SINGLE_RECURRING_BILL,
+        RECURRING_BILL_LIST
     }
 }

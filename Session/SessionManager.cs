@@ -11,6 +11,7 @@ namespace BudgetCLI.Session
         public bool UnsavedChanges = false;
         public DateOnly Today;
         public List<OneTimeBillModel> SessionBillList = [];
+        public List<RecurringBillModel> SessionRecurringBills = [];
         public SessionManager()
         {
             Connection = DatabaseHelper.GetReadWriteConnection();
@@ -21,6 +22,7 @@ namespace BudgetCLI.Session
         {
             Connection.Open();
             SessionBillList = DatabaseHelper.GetAllOneTimeBills(Connection);
+            SessionRecurringBills = DatabaseHelper.GetAllRecurringBills(Connection);
             foreach (OneTimeBillModel model in SessionBillList)
             {
                 RegisterEventsForOneTimeBill(model);

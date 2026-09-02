@@ -160,5 +160,95 @@ namespace BudgetCLI.Data
             command.Parameters.AddWithValue("$id", updatedModel.Id);
             command.ExecuteNonQuery();
         }
+
+        public static void AddRecurringBillToDatabase(RecurringBillModel model, SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO RecurringBills (Name, Amount, StartDate, EndDate, RecurringType)
+                VALUES ($name, $amount, $startDate, $endDate, $recurringType);
+            """;
+            command.Parameters.AddWithValue("$name", model.Name);
+            command.Parameters.AddWithValue("$amount", model.Amount);
+            command.Parameters.AddWithValue("$startDate", model.StartDate);
+            command.Parameters.AddWithValue("$recurringType", model.RecurringType);
+            if (model.EndDate == null)
+            {
+                command.Parameters.AddWithValue("$endDate", DBNull.Value);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("$endDate", model.EndDate);
+            }
+            command.ExecuteNonQuery();
+        }
+
+        public static RecurringBillModel? GetRecurringBillModelByName(string name, SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT * FROM RecurringBills
+                WHERE Name = $name;
+            """;
+            command.Parameters.AddWithValue("$name", name);
+
+            SqliteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                DateOnly? endDate;
+                if (reader.IsDBNull(4))
+                {
+                    endDate = null;
+                }
+                else
+                {
+                    endDate = DateOnly.FromDateTime(reader.GetDateTime(4));
+                }
+                return new RecurringBillModel(
+                    reader.GetInt16(0),
+                    reader.GetString(1),
+                    reader.GetDecimal(2),
+                    DateOnly.FromDateTime(reader.GetDateTime(3)),
+                    endDate,
+                    (RecurringTypeEnum)reader.GetInt16(5)
+                );
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static List<RecurringBillModel> GetAllRecurringBills(SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT * FROM RecurringBills
+            """;
+
+            SqliteDataReader reader = command.ExecuteReader();
+            List<RecurringBillModel> result = new();
+            while (reader.Read())
+            {
+                DateOnly? endDate;
+                if (reader.IsDBNull(4))
+                {
+                    endDate = null;
+                }
+                else
+                {
+                    endDate = DateOnly.FromDateTime(reader.GetDateTime(4));
+                }
+                result.Add(new RecurringBillModel(
+                    reader.GetInt16(0),
+                    reader.GetString(1),
+                    reader.GetDecimal(2),
+                    DateOnly.FromDateTime(reader.GetDateTime(3)),
+                    endDate,
+                    (RecurringTypeEnum)reader.GetInt16(5)
+                ));
+            }
+            return result;
+        }
     }
 }

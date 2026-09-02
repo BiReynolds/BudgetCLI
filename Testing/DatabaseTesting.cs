@@ -10,9 +10,15 @@ namespace BudgetCLI.Testing
         {
             SqliteConnection connection = DatabaseHelper.GetReadWriteConnection();
             connection.Open();
-            SqliteCommand command = connection.CreateCommand();
-            command.CommandText = File.ReadAllText("./Testing/TestScripts/ResetTestOneTimeBills.sql");
-            command.ExecuteNonQuery();
+
+            SqliteCommand command1 = connection.CreateCommand();
+            command1.CommandText = File.ReadAllText("./Testing/TestScripts/ResetTestOneTimeBills.sql");
+            command1.ExecuteNonQuery();
+
+            SqliteCommand command2 = connection.CreateCommand();
+            command2.CommandText = File.ReadAllText("./Testing/TestScripts/ResetTestRecurringBills.sql");
+            command2.ExecuteNonQuery();
+            connection.Close();
         }
         public static void OneTimeBillTest()
         {
@@ -30,7 +36,7 @@ namespace BudgetCLI.Testing
                 throw new Exception("OneTimeBillTest failed: Inserted testBill but could not look it up by name afterwards");
             }
             Console.WriteLine("Successfully pulled testBill from database by name");
-            if (billPulledByName.Id == null)
+            if (billPulledByName.Id == -1)
             {
                 transaction.Rollback();
                 throw new Exception("OneTimeBillTest failed: billPulledByName has null Id");

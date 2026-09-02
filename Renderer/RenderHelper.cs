@@ -21,15 +21,15 @@ namespace BudgetCLI.Renderer
             }
         }
 
-        public static string GetIdOrQuestionMark(int id)
+        public static string GetIdOrQuestionMark(int? id)
         {
-            if (id == -1)
+            if (id == null || id == -1)
             {
                 return "?";
             }
             else
             {
-                return id.ToString();
+                return ((int)id).ToString();
             }
         }
     }

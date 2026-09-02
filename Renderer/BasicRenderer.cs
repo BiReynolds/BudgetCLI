@@ -41,6 +41,9 @@ namespace BudgetCLI.Renderer
                 case OutputTokenEnum.RESET_NOTIFICATION:
                     RenderResetNotification((ResetNotification)outputToken);
                     break;
+                case OutputTokenEnum.RECURRING_BILL_LIST:
+                    RenderRecurringBillList((RecurringBillList)outputToken);
+                    break;
                 default:
                     throw new OutputTokenNotSupportedException(outputToken);
             }
@@ -89,6 +92,20 @@ namespace BudgetCLI.Renderer
             dataTable.AddColumn("Paid?", 5, x => { return x.IsPaid ? "x" : ""; }, TextAlignment.CENTER);
             
             dataTable.SetData(billList.Data);
+            dataTable.Render();
+        }
+
+        public void RenderRecurringBillList(RecurringBillList recurringBillList)
+        {
+            DataTable<RecurringBillDetail> dataTable = new();
+            dataTable.AddColumn("Id", 3, x => RenderHelper.GetIdOrQuestionMark(x.Id));
+            dataTable.AddColumn("Name", 25, x => x.Name);
+            dataTable.AddColumn("Amount", 10, x => x.Amount.ToString("C"), TextAlignment.RIGHT);
+            dataTable.AddColumn("Start Date", 12, x => x.StartDate.ToShortDateString(), TextAlignment.CENTER);
+            dataTable.AddColumn("End Date", 12, x => x.EndDate?.ToShortDateString() ?? "NONE", TextAlignment.CENTER);
+            dataTable.AddColumn("Recurring Type", 15, x => x.RecurringType.ToString());
+
+            dataTable.SetData(recurringBillList.Data);
             dataTable.Render();
         }
 

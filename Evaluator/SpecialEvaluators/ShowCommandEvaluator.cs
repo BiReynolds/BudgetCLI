@@ -21,13 +21,15 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
         {
             if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
-                ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
+                var ReservedWordToken = (ReservedWordToken)remainingTokens[0];
                 switch (ReservedWordToken.ReservedWord)
                 {
                     case ReservedWordEnum.BILL:
                         return EvaluateShowBillCommand(remainingTokens[1..]);
                     case ReservedWordEnum.BILLS:
                         return EvaluateShowBillsCommand(remainingTokens[1..]);
+                    case ReservedWordEnum.RECURRING:
+                        return EvaluateShowRecurringCommand(remainingTokens[1..]);
                     default:
                         throw new SubCommandNotSupportedException(ReservedWordEnum.SHOW, ReservedWordToken.ReservedWord);
                 }
@@ -65,6 +67,18 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
                 filteredBills = EvaluateHelper.ApplyFilterToOneTimeBillModels(filteredBills, filter);
             }
             return new OneTimeBillList(filteredBills);
+        }
+
+        OutputTokenBase EvaluateShowRecurringCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            if (remainingTokens.Count == 0)
+            {
+                return new RecurringBillList(Session.SessionRecurringBills);
+            }
+            else
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 0);
+            }
         }
     }
 }

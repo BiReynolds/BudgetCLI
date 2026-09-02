@@ -16,17 +16,7 @@ namespace BudgetCLI.Data.Models
                 }
             }
         }
-        public int Id { 
-            get; 
-            set
-            {
-                if (field != value)
-                {
-                    field = value;
-                    IsChanged = true;
-                }
-            }
-        } = -1;
+        public int Id { get; private set; } = -1;
         public string Name { 
             get; 
             set
