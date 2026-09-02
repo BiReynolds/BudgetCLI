@@ -9,29 +9,12 @@ namespace BudgetCLI.Evaluator
 {
     public static class EvaluateHelper
     {
-        public static ReservedWordEnum[] ReservedWordComparators = [
-            ReservedWordEnum.LESS_THAN,
-            ReservedWordEnum.GREATER_THAN,
-            ReservedWordEnum.EQUAL,
-            ReservedWordEnum.LESS_OR_EQUAL,
-            ReservedWordEnum.GREATER_OR_EQUAL,
-            ReservedWordEnum.CONTAINS
-        ];
-
         public static ReservedWordEnum[] ReservedWordTrueBooleanFields = [
             ReservedWordEnum.PAID,
         ];
 
         public static ReservedWordEnum[] ReservedWordFalseBooleanFields = [
             ReservedWordEnum.UNPAID,
-        ];
-
-        public static ReservedWordEnum[] ReservedWordOneTimeBillFields = [
-            ReservedWordEnum.NAME,
-            ReservedWordEnum.AMOUNT,
-            ReservedWordEnum.DUE_DATE,
-            ReservedWordEnum.PAID,
-            ReservedWordEnum.UNPAID
         ];
 
         public static OneTimeBillModel GetBillFromArgs(List<BudgetTokenBase> remainingTokens, SessionManager session)
@@ -66,16 +49,6 @@ namespace BudgetCLI.Evaluator
             {
                 return result;
             }
-        }
-
-        public static bool IsOneTimeBillField(ReservedWordToken testToken)
-        {
-            return ReservedWordOneTimeBillFields.Contains(testToken.ReservedWord);
-        }
-
-        public static bool IsComparator(ReservedWordToken testToken)
-        {
-            return ReservedWordComparators.Contains(testToken.ReservedWord);
         }
 
         public static bool IsTrueBooleanField(ReservedWordToken testToken)
