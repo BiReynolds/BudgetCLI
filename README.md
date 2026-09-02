@@ -29,9 +29,9 @@
 ### Basic Functionality
 - [x] Pull List of Recurring Bills ("show recurring")
 
-- [ ] Edit RecurringBillModel to add a "ReferenceDate" field.  This will be what the system uses to determine future date eligibility (ex: a weekly bill will compare the ReferenceDate's day of week to a future date's day of week to see if the future date needs an instance).  By default, this will match the StartDate
+- [x] Edit RecurringBillModel to add a "ReferenceDate" field.  This will be what the system uses to determine future date eligibility (ex: a weekly bill will compare the ReferenceDate's day of week to a future date's day of week to see if the future date needs an instance).  By default, this will match the StartDate
     - The idea in keeping this separate is to make sure that the StartDate never changes for a bill, even though we may want to change what day of the week a bill comes due on, for example
-- [ ] Edit RecurringBillModel to allow detection of changes (like the OneTimeBillModel )
+- [x] Edit RecurringBillModel to allow detection of changes (like the OneTimeBillModel )
 
 - [ ] Startup job which will add new occurrences of recurring bills on app open, if needed
     - [ ] Add jobs table (might be overkill, but will be useful if we have other jobs we want to run later)

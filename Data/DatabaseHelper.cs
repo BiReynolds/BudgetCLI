@@ -165,13 +165,15 @@ namespace BudgetCLI.Data
         {
             SqliteCommand command = connection.CreateCommand();
             command.CommandText = """
-                INSERT INTO RecurringBills (Name, Amount, StartDate, EndDate, RecurringType)
-                VALUES ($name, $amount, $startDate, $endDate, $recurringType);
+                INSERT INTO RecurringBills (Name, Amount, StartDate, EndDate, RecurringType, ReferenceDate)
+                VALUES ($name, $amount, $startDate, $endDate, $recurringType, $referenceDate);
             """;
             command.Parameters.AddWithValue("$name", model.Name);
             command.Parameters.AddWithValue("$amount", model.Amount);
             command.Parameters.AddWithValue("$startDate", model.StartDate);
+            command.Parameters.AddWithValue("$endDate", model.EndDate);
             command.Parameters.AddWithValue("$recurringType", model.RecurringType);
+            command.Parameters.AddWithValue("$referenceDate", model.ReferenceDate);
             if (model.EndDate == null)
             {
                 command.Parameters.AddWithValue("$endDate", DBNull.Value);
@@ -210,7 +212,8 @@ namespace BudgetCLI.Data
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
                     endDate,
-                    (RecurringTypeEnum)reader.GetInt16(5)
+                    (RecurringTypeEnum)reader.GetInt16(5),
+                    DateOnly.FromDateTime(reader.GetDateTime(6))
                 );
             }
             else
@@ -245,7 +248,8 @@ namespace BudgetCLI.Data
                     reader.GetDecimal(2),
                     DateOnly.FromDateTime(reader.GetDateTime(3)),
                     endDate,
-                    (RecurringTypeEnum)reader.GetInt16(5)
+                    (RecurringTypeEnum)reader.GetInt16(5),
+                    DateOnly.FromDateTime(reader.GetDateTime(6))
                 ));
             }
             return result;

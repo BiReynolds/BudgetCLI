@@ -11,6 +11,7 @@ namespace BudgetCLI.Evaluator.OutputTokens
         public DateOnly StartDate;
         public DateOnly? EndDate;
         public RecurringTypeEnum RecurringType;
+        public DateOnly ReferenceDate;
         public RecurringBillDetail(RecurringBillModel model) : base(OutputTokenEnum.SINGLE_RECURRING_BILL)
         {
             Id = model.Id;
@@ -19,6 +20,7 @@ namespace BudgetCLI.Evaluator.OutputTokens
             StartDate = model.StartDate;
             EndDate = model.EndDate;
             RecurringType = model.RecurringType;
+            ReferenceDate = model.ReferenceDate;
         }
     }
 }

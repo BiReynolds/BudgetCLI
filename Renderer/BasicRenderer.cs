@@ -104,6 +104,7 @@ namespace BudgetCLI.Renderer
             dataTable.AddColumn("Start Date", 12, x => x.StartDate.ToShortDateString(), TextAlignment.CENTER);
             dataTable.AddColumn("End Date", 12, x => x.EndDate?.ToShortDateString() ?? "NONE", TextAlignment.CENTER);
             dataTable.AddColumn("Recurring Type", 15, x => x.RecurringType.ToString());
+            dataTable.AddColumn("Reference Date", 12, x => x.ReferenceDate.ToString(), TextAlignment.CENTER);
 
             dataTable.SetData(recurringBillList.Data);
             dataTable.Render();

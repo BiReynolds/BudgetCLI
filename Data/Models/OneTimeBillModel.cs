@@ -4,7 +4,7 @@ namespace BudgetCLI.Data.Models
     {
         public event EventHandler? OneTimeBillModelChanged;
         public int? ParentId { get; private set; }
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public bool IsChanged { 
             get; 
             private set
@@ -15,7 +15,7 @@ namespace BudgetCLI.Data.Models
                     OnOneTimeBillModelChanged(EventArgs.Empty);
                 }
             }
-        }
+        } = false;
         public int Id { get; private set; } = -1;
         public string Name { 
             get; 
