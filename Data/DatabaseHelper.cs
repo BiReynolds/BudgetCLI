@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using BudgetCLI.Data.Models;
+using System.Data.Common;
 
 namespace BudgetCLI.Data
 {
@@ -12,7 +13,8 @@ namespace BudgetCLI.Data
             if (!File.Exists(DatabasePath))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(DatabasePath) ?? "");
-                File.Create(DatabasePath);
+                FileStream file = File.Create(DatabasePath);
+                file.Close();
             }
         }
 
@@ -32,7 +34,14 @@ namespace BudgetCLI.Data
             command.Parameters.AddWithValue("$amount", newBill.Amount);
             command.Parameters.AddWithValue("$dueDate", newBill.DueDate);
             command.Parameters.AddWithValue("$isPaid", newBill.IsPaid);
-            command.Parameters.AddWithValue("$parentId", newBill.ParentId);
+            if (newBill.ParentId == null)
+            {
+                command.Parameters.AddWithValue("$parentId", DBNull.Value);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("$parentId", newBill.ParentId);
+            }
             command.ExecuteNonQuery();
         }
 
