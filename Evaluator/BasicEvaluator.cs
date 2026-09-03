@@ -130,6 +130,7 @@ namespace BudgetCLI.Evaluator
                             recurringBillModel = Session.GetRecurringBillModelByName(recurringBillModel.Name);
                             List<OneTimeBillModel> recurringBillInstances = recurringBillModel.GetNewBillInstances(DateOnly.FromDateTime(DateTime.Today).AddMonths(12));
                             Session.AddManyOneTimeBills(recurringBillInstances);
+                            Session.SaveSession();
                             return new SimpleTextOutput($"Recurring bill {recurringBillModel.Name} and next year of instances added");
                         }
                     default:
@@ -153,6 +154,10 @@ namespace BudgetCLI.Evaluator
                         OneTimeBillModel deletedBill = EvaluateHelper.GetBillFromArgs(remainingTokens[1..], Session);
                         Session.DeleteOneTimeBill(deletedBill);
                         return new SimpleTextOutput($"bill {deletedBill.Name} deleted");
+                    case ReservedWordEnum.RECURRING:
+                        RecurringBillModel deletedRecurringBill = EvaluateHelper.GetRecurringBillFromArgs(remainingTokens[1..], Session);
+                        Session.DeleteRecurringBillAndUnpaidInstances(deletedRecurringBill);
+                        return new SimpleTextOutput($"recurring bill {deletedRecurringBill} deleted");
                     default:
                         throw new SubCommandNotSupportedException(ReservedWordEnum.DELETE, ReservedWordToken.ReservedWord);
                 }

@@ -1,5 +1,6 @@
 using BudgetCLI.Data;
 using BudgetCLI.Data.Models;
+using BudgetCLI.Evaluator.OutputTokens;
 using Microsoft.Data.Sqlite;
 
 namespace BudgetCLI.Session
@@ -67,8 +68,14 @@ namespace BudgetCLI.Session
                         DatabaseHelper.AddRecurringBillToDatabase(recurringBillModel, Connection);
                     }
                 }
-                // TODO: Handle recurring bill deletion
-                // TODO: Handle recurring bill editing
+                else if (recurringBillModel.IsDeleted)
+                {
+                    DatabaseHelper.DeleteRecurringBill(recurringBillModel, Connection);
+                }
+                else if (recurringBillModel.IsChanged)
+                {
+                    DatabaseHelper.UpdateRecurringBill(recurringBillModel, Connection);
+                }
             }
             Connection.Close();
             ResetSession();
@@ -105,6 +112,17 @@ namespace BudgetCLI.Session
         public void DeleteOneTimeBill(OneTimeBillModel chosenBill)
         {
             chosenBill.IsDeleted = true;
+            UnsavedChanges = true;
+        }
+
+        public void DeleteRecurringBillAndUnpaidInstances(RecurringBillModel recurringBill)
+        {
+            recurringBill.IsDeleted = true;
+            IEnumerable<OneTimeBillModel> billInstances = SessionBillList.Where(x => (x.ParentId == recurringBill.Id) && !x.IsPaid);
+            foreach (OneTimeBillModel model in billInstances)
+            {
+                model.IsDeleted = true;
+            }
             UnsavedChanges = true;
         }
 

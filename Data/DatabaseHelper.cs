@@ -60,7 +60,7 @@ namespace BudgetCLI.Data
                     amountParameter.Value = bill.Amount;
                     dueDateParameter.Value = bill.DueDate;
                     isPaidParameter.Value = bill.IsPaid;
-                    parentIdParameter.Value = bill.ParentId;
+                    parentIdParameter.Value = GetValueOrDBNull(bill.ParentId);
                     command.ExecuteNonQuery();
                 }
 
@@ -164,6 +164,26 @@ namespace BudgetCLI.Data
             return numDeletions > 0;
         }
 
+        public static void DeleteManyOneTimeBills(IEnumerable<OneTimeBillModel> billsToDelete, SqliteConnection connection)
+        {
+            using (var transaction = connection.BeginTransaction()) {
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText = """
+                    DELETE FROM OneTimeBills
+                    Where Id = $id;
+                """;
+                var idParameter = CreateParameterAndAddToCommand("$id", command);
+
+                foreach (var bill in billsToDelete)
+                {
+                    idParameter.Value = bill.Id;
+                    command.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
+        }
+
         public static void UpdateOneTimeBill(OneTimeBillModel updatedModel, SqliteConnection connection)
         {
             SqliteCommand command = connection.CreateCommand();
@@ -181,6 +201,7 @@ namespace BudgetCLI.Data
             command.Parameters.AddWithValue("$dueDate", updatedModel.DueDate);
             command.Parameters.AddWithValue("$isPaid", updatedModel.IsPaid);
             command.Parameters.AddWithValue("$id", updatedModel.Id);
+
             command.ExecuteNonQuery();
         }
 
@@ -254,6 +275,45 @@ namespace BudgetCLI.Data
             }
             return result;
         }
+
+        public static void DeleteRecurringBill(RecurringBillModel recurringBill, SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                DELETE FROM RecurringBills
+                WHERE Id = $id;
+            """;
+            command.Parameters.AddWithValue("$id", recurringBill.Id);
+            
+            command.ExecuteNonQuery();
+        }
+
+        public static void UpdateRecurringBill(RecurringBillModel recurringBill, SqliteConnection connection)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                UPDATE RecurringBills
+                SET
+                Name = $name,
+                Amount = $amount,
+                StartDate = $startDate,
+                EndDate = $endDate,
+                RecurringType = $recurringType,
+                ReferenceDate = $referenceDate,
+                LastOneTimeDueDateAdded = $lastOneTimeDueDateAdded;
+            """;
+
+            command.Parameters.AddWithValue("$name", recurringBill.Name);
+            command.Parameters.AddWithValue("$amount", recurringBill.Amount);
+            command.Parameters.AddWithValue("$startDate", recurringBill.StartDate);
+            AddParameterWithNullableValueToCommand(command, "$endDate", recurringBill.EndDate);
+            command.Parameters.AddWithValue("$recurringType", recurringBill.RecurringType);
+            command.Parameters.AddWithValue("$referenceDate", recurringBill.ReferenceDate);
+            AddParameterWithNullableValueToCommand(command, "$lastOneTimeDueDateAdded", recurringBill.LastOneTimeDueDateAdded);
+
+            command.ExecuteNonQuery();
+        }
+
         public static List<BudgetJobModel> GetAllJobsFromDatabase(SqliteConnection connection)
         {
             SqliteCommand command = connection.CreateCommand();
@@ -315,6 +375,18 @@ namespace BudgetCLI.Data
             else
             {
                 return notNullSelector(reader, ordinal);
+            }
+        }
+
+        static object? GetValueOrDBNull<T>(T? nullableValue) where T : struct
+        {
+            if (nullableValue == null)
+            {
+                return DBNull.Value;
+            }
+            else
+            {
+                return nullableValue;
             }
         }
     }

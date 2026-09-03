@@ -164,7 +164,7 @@ namespace BudgetCLI.Data.Models
 
         List<OneTimeBillModel> GetNewWeeklyBillInstances(DateOnly endDate)
         {
-            DateOnly currDueDate = LastOneTimeDueDateAdded ?? StartDate;
+            DateOnly currDueDate = LastOneTimeDueDateAdded?.AddDays(7) ?? StartDate;
             List<OneTimeBillModel> result = new();
             while (currDueDate < endDate)
             {
@@ -179,7 +179,7 @@ namespace BudgetCLI.Data.Models
         }
         List<OneTimeBillModel> GetNewBiweeklyBillInstances(DateOnly endDate)
         {
-            DateOnly currDueDate = LastOneTimeDueDateAdded ?? StartDate;
+            DateOnly currDueDate = LastOneTimeDueDateAdded?.AddDays(14) ?? StartDate;
             List<OneTimeBillModel> result = new();
             while (currDueDate < endDate)
             {
@@ -194,7 +194,7 @@ namespace BudgetCLI.Data.Models
         }
         List<OneTimeBillModel> GetNewMonthlyBillInstances(DateOnly endDate)
         {
-            DateOnly currDueDate = LastOneTimeDueDateAdded ?? StartDate;
+            DateOnly currDueDate = LastOneTimeDueDateAdded?.AddMonths(1) ?? StartDate;
             List<OneTimeBillModel> result = new();
             while (currDueDate < endDate)
             {
