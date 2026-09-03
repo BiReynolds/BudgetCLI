@@ -17,9 +17,15 @@ namespace BudgetCLI.Evaluator
             ReservedWordEnum.UNPAID,
         ];
 
+        public static Dictionary<ReservedWordEnum, RecurringTypeEnum> ReservedWordToRecurringTypeDict = new()
+        {
+            {ReservedWordEnum.WEEKLY, RecurringTypeEnum.WEEKLY},
+            {ReservedWordEnum.BIWEEKLY, RecurringTypeEnum.BIWEEKLY},
+            {ReservedWordEnum.MONTHLY, RecurringTypeEnum.MONTHLY}
+        };
+
         public static OneTimeBillModel GetBillFromArgs(List<BudgetTokenBase> remainingTokens, SessionManager session)
         {
-            // Exact same method as "ShowCommandHelper.GetShownBillFromArgs," and will likely also be used for other commands... but will need a slight refactor of various methods
             if (remainingTokens.Count != 1)
             {
                 throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
@@ -48,6 +54,78 @@ namespace BudgetCLI.Evaluator
             else 
             {
                 return result;
+            }
+        }
+
+        public static OneTimeBillModel CreateBillFromArgs(List<BudgetTokenBase> remainingTokens)
+        {
+            if (remainingTokens.Count != 3)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 3);
+            }
+            string name = ((StringToken)remainingTokens[0]).Value;
+            decimal amount = ((NumberToken)remainingTokens[1]).Value;
+            DateOnly dueDate = ((DateToken)remainingTokens[2]).Value;
+            return new OneTimeBillModel(name, amount, dueDate, false);
+        }
+
+        public static RecurringBillModel GetRecurringBillFromArgs(List<BudgetTokenBase> remainingTokens, SessionManager session)
+        {
+            if (remainingTokens.Count != 1)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
+            }
+
+            RecurringBillModel? result;
+            if (remainingTokens[0].TokenType == BudgetTokenEnum.STRING)
+            {
+                string billName = ((StringToken)remainingTokens[0]).Value;
+                result = session.SessionRecurringBills.First(x => x.Name == billName);
+            }
+            else
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
+            }
+
+            if (result == null)
+            {
+                throw new Exception($"No recurring bill in db with specified criteria");
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        public static RecurringBillModel CreateRecurringBillFromArgs(List<BudgetTokenBase> remainingTokens)
+        {
+            if (remainingTokens[3].TokenType == BudgetTokenEnum.RESERVED_WORD)
+            {
+                
+                string name = ((StringToken)remainingTokens[0]).Value;
+                decimal amount = ((NumberToken)remainingTokens[1]).Value;
+                DateOnly startDate = ((DateToken)remainingTokens[2]).Value;
+                if (!ReservedWordToRecurringTypeDict.TryGetValue(((ReservedWordToken)remainingTokens[3]).ReservedWord, out RecurringTypeEnum recurringType))
+                {
+                    throw new Exception($"Expected a Recurring Type, received {((ReservedWordToken)remainingTokens[3]).ReservedWord}");
+                }
+                if (remainingTokens.Count == 4)
+                {
+                    return new RecurringBillModel(name, amount, startDate, recurringType);
+                }
+                else if (remainingTokens[4].TokenType == BudgetTokenEnum.DATE)
+                {
+                    DateOnly endDate = ((DateToken)remainingTokens[4]).Value;
+                    return new RecurringBillModel(name, amount, startDate, endDate, recurringType);
+                }
+                else
+                {
+                    throw new UnexpectedArgTypeException(remainingTokens[4], BudgetTokenEnum.DATE);
+                }
+            }
+            else
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[3], BudgetTokenEnum.RESERVED_WORD);
             }
         }
 

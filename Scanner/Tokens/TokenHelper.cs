@@ -24,7 +24,10 @@ namespace BudgetCLI.Scanner.Tokens
             {"<=", ReservedWordEnum.LESS_OR_EQUAL},
             {">=", ReservedWordEnum.GREATER_OR_EQUAL},
             {"contains", ReservedWordEnum.CONTAINS},
-            {"recurring", ReservedWordEnum.RECURRING}
+            {"recurring", ReservedWordEnum.RECURRING},
+            {"weekly", ReservedWordEnum.WEEKLY},
+            {"biweekly", ReservedWordEnum.BIWEEKLY},
+            {"monthly", ReservedWordEnum.MONTHLY}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)

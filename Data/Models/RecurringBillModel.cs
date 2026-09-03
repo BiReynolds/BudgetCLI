@@ -91,10 +91,10 @@ namespace BudgetCLI.Data.Models
         }
 
         public DateOnly? LastOneTimeDueDateAdded { get; set; }
-        // When program creates new RecurringBillModel, it will call this constructor
-        public RecurringBillModel(int? id, string name, decimal amount, DateOnly startDate, RecurringTypeEnum recurringType)
+        // When program creates new RecurringBillModel, it will call one of these constructors
+        public RecurringBillModel(string name, decimal amount, DateOnly startDate, RecurringTypeEnum recurringType)
         {
-            Id = id;
+            Id = null;
             Name = name;
             Amount = amount;
             StartDate = startDate;
@@ -103,6 +103,19 @@ namespace BudgetCLI.Data.Models
             ReferenceDate = startDate;
             LastOneTimeDueDateAdded = null;
         }
+
+        public RecurringBillModel(string name, decimal amount, DateOnly startDate, DateOnly endDate, RecurringTypeEnum recurringType)
+        {
+            Id = null;
+            Name = name;
+            Amount = amount;
+            StartDate = startDate;
+            EndDate = endDate;
+            RecurringType = recurringType;
+            ReferenceDate = startDate;
+            LastOneTimeDueDateAdded = null;
+        }
+
         // When the db reads a RecurringBill from the db, it will call this constructor
         public RecurringBillModel(int? id, string name, decimal amount, DateOnly startDate, DateOnly? endDate, RecurringTypeEnum recurringType, DateOnly referenceDate, DateOnly? lastOneTimeDueDateAdded)
         {
@@ -132,6 +145,10 @@ namespace BudgetCLI.Data.Models
 
         public List<OneTimeBillModel> GetNewBillInstances(DateOnly endDate)
         {
+            if (EndDate != null && EndDate < endDate)
+            {
+                endDate = (DateOnly)EndDate;
+            }
             switch (RecurringType)
             {
                 case RecurringTypeEnum.WEEKLY:
@@ -154,7 +171,10 @@ namespace BudgetCLI.Data.Models
                 result.Add(CreateOneTimeBillInstance(currDueDate));
                 currDueDate = currDueDate.AddDays(7);
             }
-            LastOneTimeDueDateAdded = result[^1].DueDate;
+            if (result.Count > 0)
+            {
+                LastOneTimeDueDateAdded = result[^1].DueDate;
+            }
             return result;
         }
         List<OneTimeBillModel> GetNewBiweeklyBillInstances(DateOnly endDate)
@@ -166,7 +186,10 @@ namespace BudgetCLI.Data.Models
                 result.Add(CreateOneTimeBillInstance(currDueDate));
                 currDueDate = currDueDate.AddDays(14);
             }
-            LastOneTimeDueDateAdded = result[^1].DueDate;
+            if (result.Count > 0)
+            {
+                LastOneTimeDueDateAdded = result[^1].DueDate;
+            }
             return result;
         }
         List<OneTimeBillModel> GetNewMonthlyBillInstances(DateOnly endDate)

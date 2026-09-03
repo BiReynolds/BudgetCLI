@@ -11,7 +11,7 @@ namespace BudgetCLI.Jobs.JobInstances
 
         public bool CheckDue(DateOnly lastRunDate)
         {
-            return lastRunDate < DateOnly.FromDateTime(DateTime.Today);
+            return true;
         }
 
         public void RunJob(SessionManager session)

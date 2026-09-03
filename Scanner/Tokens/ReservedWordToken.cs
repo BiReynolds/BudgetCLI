@@ -33,6 +33,9 @@ namespace BudgetCLI.Scanner.Tokens
         LESS_OR_EQUAL,
         GREATER_OR_EQUAL,
         CONTAINS,
-        RECURRING
+        RECURRING,
+        WEEKLY,
+        BIWEEKLY,
+        MONTHLY
     }
 }

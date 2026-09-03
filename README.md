@@ -33,16 +33,16 @@
     - The idea in keeping this separate is to make sure that the StartDate never changes for a bill, even though we may want to change what day of the week a bill comes due on, for example
 - [x] Edit RecurringBillModel to allow detection of changes (like the OneTimeBillModel )
 
-- [ ] Startup job which will add new occurrences of recurring bills on app open, if needed
+- [x] Startup job which will add new occurrences of recurring bills on app open, if needed
     - [x] Add jobs table (might be overkill, but will be useful if we have other jobs we want to run later)
     - [x] Add column `RecurringBills.LastOneTimeDueDateAdded` which will keep track of the date of the last instance of each recurring bill which was added to the db
-    - [x] On startup, if JobLastRunTime < today, check each recurring bill's LastOneTimeDueDateAdded to see if another instance should exist between LastOneTimeDueDateAdded and today + 1 year.  If so, add it (or them, if multiple are needed)
+    - [x] On startup, check each recurring bill's LastOneTimeDueDateAdded to see if another instance should exist between LastOneTimeDueDateAdded and today + 1 year.  If so, add it (or them, if multiple are needed)
 
-- [ ] Add Recurring Bill (and corresponding one-time instances)
-    - [ ] Syntax: add recurring (name) (amount) (firstDue) (recurringType) (optional: endDate)
-    - [ ] Adds record to RecurringBills table
-    - [ ] Adds a record to OneTimeBills table for each occurrence 
-        - [ ] Will add records up to 1 year in advance, or less if endDate demands it
+- [x] Add Recurring Bill (and corresponding one-time instances)
+    - [x] Syntax: add bill (name) (amount) (firstDue) (recurringType) (optional: endDate)
+    - [x] Adds record to RecurringBills table
+    - [x] Adds a record to OneTimeBills table for each occurrence 
+        - [x] Will add records up to 1 year in advance, or less if endDate demands it
 
 - [ ] Delete Recurring Bill (and all one-time instances)
     - [ ] Syntax: delete recurring (name)

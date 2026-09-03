@@ -58,8 +58,30 @@ namespace BudgetCLI.Session
                     DatabaseHelper.UpdateOneTimeBill(billModel, Connection);
                 }
             }
+            foreach (RecurringBillModel recurringBillModel in SessionRecurringBills)
+            {
+                if (recurringBillModel.Id == null)
+                {
+                    if (!recurringBillModel.IsDeleted)
+                    {
+                        DatabaseHelper.AddRecurringBillToDatabase(recurringBillModel, Connection);
+                    }
+                }
+                // TODO: Handle recurring bill deletion
+                // TODO: Handle recurring bill editing
+            }
             Connection.Close();
             ResetSession();
+        }
+        
+        public OneTimeBillModel GetOneTimeBillByName(string name)
+        {
+            return SessionBillList.First(x => x.Name == name);
+        }
+
+        public RecurringBillModel GetRecurringBillModelByName(string name)
+        {
+            return SessionRecurringBills.First(x => x.Name == name);
         }
 
         public void AddNewOneTimeBill(OneTimeBillModel billModel)
@@ -72,6 +94,12 @@ namespace BudgetCLI.Session
         {
             UnsavedChanges = true;
             SessionBillList.AddRange(billModels);
+        }
+
+        public void AddNewRecurringBill(RecurringBillModel recurringBillModel)
+        {
+            UnsavedChanges = true;
+            SessionRecurringBills.Add(recurringBillModel);
         }
 
         public void DeleteOneTimeBill(OneTimeBillModel chosenBill)

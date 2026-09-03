@@ -93,16 +93,45 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)
         {
+            if (remainingTokens.Count < 4 || remainingTokens.Count > 6)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, [4, 5, 6]);
+            }
+            if (remainingTokens[1].TokenType != BudgetTokenEnum.STRING)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
+            }
+            if (remainingTokens[2].TokenType != BudgetTokenEnum.NUMBER)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
+            }
+            if (remainingTokens[3].TokenType != BudgetTokenEnum.DATE)
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[2], BudgetTokenEnum.DATE);
+            }
+
             if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
                 ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
                 switch (ReservedWordToken.ReservedWord)
                 {
                     case ReservedWordEnum.BILL:
-                        GetAddBillArgs(remainingTokens[1..], out string name, out decimal amount, out DateOnly dueDate);
-                        OneTimeBillModel model = new(name, amount, dueDate, false);
-                        Session.AddNewOneTimeBill(model);
-                        return new SimpleTextOutput($"Bill {name} added");
+                        if (remainingTokens.Count == 4)
+                        {
+                            OneTimeBillModel billModel = EvaluateHelper.CreateBillFromArgs(remainingTokens[1..]);
+                            Session.AddNewOneTimeBill(billModel);
+                            return new SimpleTextOutput($"Bill {billModel.Name} added");
+                        }
+                        else
+                        {
+                            RecurringBillModel recurringBillModel = EvaluateHelper.CreateRecurringBillFromArgs(remainingTokens[1..]);
+                            Session.AddNewRecurringBill(recurringBillModel);
+                            Session.SaveSession();
+                            recurringBillModel = Session.GetRecurringBillModelByName(recurringBillModel.Name);
+                            List<OneTimeBillModel> recurringBillInstances = recurringBillModel.GetNewBillInstances(DateOnly.FromDateTime(DateTime.Today).AddMonths(12));
+                            Session.AddManyOneTimeBills(recurringBillInstances);
+                            return new SimpleTextOutput($"Recurring bill {recurringBillModel.Name} and next year of instances added");
+                        }
                     default:
                         throw new SubCommandNotSupportedException(ReservedWordEnum.ADD, ReservedWordToken.ReservedWord);
                 }
@@ -111,29 +140,6 @@ namespace BudgetCLI.Evaluator
             {
                 throw new ExpectedSubCommandException(ReservedWordEnum.ADD);
             }
-        }
-
-        void GetAddBillArgs(List<BudgetTokenBase> remainingTokens, out string name, out decimal amount, out DateOnly dueDate)
-        {
-            if (remainingTokens.Count != 3)
-            {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 3);
-            }
-            if (remainingTokens[0].TokenType != BudgetTokenEnum.STRING)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
-            }
-            if (remainingTokens[1].TokenType != BudgetTokenEnum.NUMBER)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
-            }
-            if (remainingTokens[2].TokenType != BudgetTokenEnum.DATE)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[2], BudgetTokenEnum.DATE);
-            }
-            name = ((StringToken)remainingTokens[0]).Value;
-            amount = ((NumberToken)remainingTokens[1]).Value;
-            dueDate = ((DateToken)remainingTokens[2]).Value;
         }
 
         OutputTokenBase EvaluateDeleteCommand(List<BudgetTokenBase> remainingTokens)
