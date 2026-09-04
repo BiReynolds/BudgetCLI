@@ -2,6 +2,7 @@ using BudgetCLI.Core.Objects;
 using BudgetCLI.Core.Interfaces;
 using BudgetCLI.Session;
 using BudgetCLI.Jobs;
+using BudgetCLI.Wizards;
 
 namespace BudgetCLI.Core
 {
@@ -11,6 +12,7 @@ namespace BudgetCLI.Core
         IScanner Scanner;
         IEvaluator Evaluator;
         IRenderer Renderer;
+        StartupWizard StartupWizard = new();
         string CurrentInput = "";
         List<BudgetTokenBase> CurrentScannedTokens = [];
         SessionManager Session;
@@ -83,7 +85,8 @@ namespace BudgetCLI.Core
                 Running = false;
             };
 
-            HandleInput($"show bills duedate <= {Session.Today.AddDays(7).ToString("yyyy/MM/dd")}");
+            List<string> startupCommands = StartupWizard.GetCommandsFromWizard();
+            startupCommands.ForEach(x => HandleInput(x));
             Console.WriteLine("Budget program started");
         }
 

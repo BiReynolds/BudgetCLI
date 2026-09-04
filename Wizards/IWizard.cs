@@ -2,6 +2,7 @@ namespace BudgetCLI.Wizards
 {
     public interface IWizard
     {
-        public string GetCommandFromWizard();
+        public List<string> GetCommandsFromWizard();
+
     }
 }

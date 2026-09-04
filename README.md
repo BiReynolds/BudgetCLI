@@ -30,10 +30,10 @@
 - Delete Recurring Bill (and all one-time instances)
     - Syntax: `delete recurring (name)`
 - Projection functionality
-    - Syntax: `projection (amount) (optional: numMonths)`
-        - Shows a table of the next numMonths months of dates, the projected balance on each of those days (based on provided amount), and bills coming out on each of those days
+    - Syntax: `projection (optional: numMonths)`
+        - Shows a table of the next numMonths months of dates, the projected balance on each of those days, and bills coming out on each of those days
         - If numMonths is not provided, will default to 1 month
-    - Syntax: `projection summary (amount)`
+    - Syntax: `projection summary`
         - Shows a small table with 3 rows: "Next Month", "1 - 2 Months", and "2 - 3 Months"
         - Each row will display the date of the lowest balance in the respective range, the lowest balance value, and the bills which are coming out on the day of the lowest balance
 
