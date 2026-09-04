@@ -133,7 +133,8 @@ namespace BudgetCLI.Evaluator
         public static ProjectionTableData GetProjectionTable(List<OneTimeBillModel> allBills, decimal startBalance, int numMonths)
         {
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.Today);
-            IEnumerable<OneTimeBillModel> stillDueBills = allBills.Where(x => x.DueDate < currentDate);
+            IEnumerable<OneTimeBillModel> activeBills = allBills.Where(x => !x.IsDeleted && !x.IsPaid);
+            IEnumerable<OneTimeBillModel> stillDueBills = activeBills.Where(x => x.DueDate < currentDate);
             IEnumerable<string> stillDueBillNames = stillDueBills.Select(x => x.Name);
             decimal currentBalance = startBalance + stillDueBills.Sum(x => x.Amount);
             ProjectionTableData projectionTable = new(startBalance, currentBalance, stillDueBillNames);
@@ -141,7 +142,7 @@ namespace BudgetCLI.Evaluator
             DateOnly endDate = currentDate.AddMonths(numMonths);
             while (currentDate < endDate)
             {
-                currentBillsDue = allBills.Where(x => x.DueDate == currentDate);
+                currentBillsDue = activeBills.Where(x => x.DueDate == currentDate);
                 currentBalance += currentBillsDue.Sum(x => x.Amount);
                 projectionTable.AddRow(currentDate, currentBalance, currentBillsDue.Select(x => x.Name));
                 currentDate = currentDate.AddDays(1);

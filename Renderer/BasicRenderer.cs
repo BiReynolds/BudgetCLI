@@ -133,9 +133,11 @@ namespace BudgetCLI.Renderer
 
         public void RenderProjectionSummary(ProjectionSummary summary)
         {
+            string[] rowLabels = ["Next 30 Days", "30 - 60 Days", "60 - 90 Days"];
             DataTable<ProjectionTableDataRow> dataTable = new();
-            dataTable.AddColumn("Date", 12, x => x.Date.ToShortDateString(), TextAlignment.CENTER);
-            dataTable.AddColumn("Balance", 13, x => x.Balance.ToString(), TextAlignment.RIGHT);
+            dataTable.AddColumn("Time Range", 15, x => rowLabels[dataTable.GetRowNumber(x)]);
+            dataTable.AddColumn("Minimum Balance Date", 20, x => x.Date.ToShortDateString(), TextAlignment.CENTER);
+            dataTable.AddColumn("Minimum Balance", 15, x => x.Balance.ToString(), TextAlignment.RIGHT);
             dataTable.AddColumn("Bills Due", 50, x => string.Join(", ", x.BillsDue));
 
             dataTable.SetData([summary.NextThirtyMinRow, summary.ThirtyToSixtyMinRow, summary.SixtyToNinetyMinRow]);

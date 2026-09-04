@@ -166,7 +166,7 @@ namespace BudgetCLI.Evaluator
             }
             else
             {
-                throw new ExpectedSubCommandException(ReservedWordEnum.ADD);
+                throw new ExpectedSubCommandException(ReservedWordEnum.DELETE);
             }
         }
 
@@ -201,24 +201,16 @@ namespace BudgetCLI.Evaluator
         {
             if (remainingTokens.Count == 0)
             {
-                throw new WrongNumberOfArgumentsException(0, [1, 2]);
+                return EvaluateHelper.GetProjectionTable(Session.SessionBillList, Session.SessionBalance, 1);
+            }
+            else if (remainingTokens.Count > 1)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
             }
             else if (remainingTokens[0].TokenType == BudgetTokenEnum.NUMBER)
             {
-                var amountToken = (NumberToken)remainingTokens[0];
-                if (remainingTokens.Count == 1)
-                {
-                    return EvaluateHelper.GetProjectionTable(Session.SessionBillList, amountToken.Value, 1);
-                }
-                else if (remainingTokens[1].TokenType == BudgetTokenEnum.NUMBER)
-                {
-                    var numMonthsToken = (NumberToken)remainingTokens[1];
-                    return EvaluateHelper.GetProjectionTable(Session.SessionBillList, amountToken.Value, (int)numMonthsToken.Value);
-                }
-                else
-                {
-                    throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
-                }
+                var numMonthsToken = (NumberToken)remainingTokens[0];
+                return EvaluateHelper.GetProjectionTable(Session.SessionBillList, Session.SessionBalance, (int)numMonthsToken.Value);
             }
             else if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
@@ -227,22 +219,13 @@ namespace BudgetCLI.Evaluator
                 {
                     throw new SubCommandNotSupportedException(ReservedWordEnum.PROJECTION, subCommandToken.ReservedWord);
                 }
-                else if (remainingTokens.Count != 2)
+                else 
                 {
-                    throw new WrongNumberOfArgumentsException(remainingTokens.Count, 2);
-                }
-                else if (remainingTokens[1].TokenType == BudgetTokenEnum.NUMBER)
-                {
-                    var balanceToken = (NumberToken)remainingTokens[1];
-                    ProjectionTableData projectionData = EvaluateHelper.GetProjectionTable(Session.SessionBillList, balanceToken.Value, 3);
+                    ProjectionTableData projectionData = EvaluateHelper.GetProjectionTable(Session.SessionBillList, Session.SessionBalance, 3);
                     ProjectionTableDataRow nextThirtyMinRow = projectionData.Rows.Where(x => x.Date < Session.Today.AddMonths(1)).MinBy(x => x.Balance);
                     ProjectionTableDataRow thirtyToSixtyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(1) && x.Date < Session.Today.AddMonths(2)).MinBy(x => x.Balance);
                     ProjectionTableDataRow sixtyToNinetyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(2) && x.Date < Session.Today.AddMonths(3)).MinBy(x => x.Balance);
                     return new ProjectionSummary(nextThirtyMinRow, thirtyToSixtyMinRow, sixtyToNinetyMinRow);
-                }
-                else
-                {
-                    throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
                 }
             }
             else

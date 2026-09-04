@@ -21,10 +21,31 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
             {
                 case ReservedWordEnum.BILL:
                     return EvaluateEditBillCommand(remainingTokens[1..]);
+                case ReservedWordEnum.BALANCE:
+                    return EvaluateEditBalanceCommand(remainingTokens[1..]);
                 default:
                     throw new SubCommandNotSupportedException(ReservedWordEnum.EDIT, editedObjectType.ReservedWord);
             }
         }
+
+        OutputTokenBase EvaluateEditBalanceCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            if (remainingTokens.Count != 1)
+            {
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, 1);
+            }
+            else if (remainingTokens[0].TokenType == BudgetTokenEnum.NUMBER)
+            {
+                var newBalanceToken = (NumberToken)remainingTokens[0];
+                Session.SessionBalance = newBalanceToken.Value;
+                return new SimpleTextOutput($"Session Balance updated to {Session.SessionBalance}");
+            }
+            else
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.NUMBER);
+            }
+        }
+
         OutputTokenBase EvaluateEditBillCommand(List<BudgetTokenBase> remainingTokens)
         {
             EditBillCommandArgTypeCheck(remainingTokens);

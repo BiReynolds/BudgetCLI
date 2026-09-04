@@ -11,6 +11,7 @@ namespace BudgetCLI.Session
         public bool IsInitialized = false;
         public bool UnsavedChanges = false;
         public DateOnly Today;
+        public decimal SessionBalance = 0;
         public List<OneTimeBillModel> SessionBillList = [];
         public List<RecurringBillModel> SessionRecurringBills = [];
         public SessionManager()

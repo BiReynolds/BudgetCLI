@@ -27,6 +27,11 @@ namespace BudgetCLI.Renderer.RenderObjects
             Data.Add(newDatum);
         }
 
+        public int GetRowNumber(DataType datum)
+        {
+            return Data.IndexOf(datum);
+        }
+
         public void Render()
         {
             RenderHeader();

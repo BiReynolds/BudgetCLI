@@ -16,17 +16,19 @@ namespace BudgetCLI.Evaluator.OutputTokens
         }
         public void AddRow(DateOnly date, decimal balance, IEnumerable<string> billsDue)
         {
-            Rows.Add(new ProjectionTableDataRow(date, balance, billsDue));
+            Rows.Add(new ProjectionTableDataRow(Rows.Count, date, balance, billsDue));
         }
     }
 
     public class ProjectionTableDataRow
     {
+        public int RowNumber;
         public DateOnly Date;
         public decimal Balance;
         public string[] BillsDue;
-        public ProjectionTableDataRow(DateOnly date, decimal balance, IEnumerable<string> billsDue)
+        public ProjectionTableDataRow(int rowNumber, DateOnly date, decimal balance, IEnumerable<string> billsDue)
         {
+            RowNumber = rowNumber;
             Date = date;
             Balance = balance;
             BillsDue = billsDue.ToArray();

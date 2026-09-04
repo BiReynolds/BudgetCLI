@@ -47,9 +47,14 @@ namespace BudgetCLI.Core
 
         public void HandleUserInput()
         {
+            HandleInput(CurrentInput);
+        }
+
+        void HandleInput(string stringInput)
+        {
             try
             {
-                CurrentScannedTokens = Scanner.Scan(CurrentInput);
+                CurrentScannedTokens = Scanner.Scan(stringInput);
                 CurrentOutput = Evaluator.Evaluate(CurrentScannedTokens);
             }
             catch (Exception e)
@@ -77,6 +82,8 @@ namespace BudgetCLI.Core
             {
                 Running = false;
             };
+
+            HandleInput($"show bills duedate <= {Session.Today.AddDays(7).ToString("yyyy/MM/dd")}");
             Console.WriteLine("Budget program started");
         }
 
