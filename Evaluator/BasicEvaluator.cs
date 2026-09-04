@@ -199,7 +199,56 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateProjectionCommand(List<BudgetTokenBase> remainingTokens)
         {
-            return EvaluateHelper.GetProjectionTable(Session.SessionBillList, 1000m, 1);
+            if (remainingTokens.Count == 0)
+            {
+                throw new WrongNumberOfArgumentsException(0, [1, 2]);
+            }
+            else if (remainingTokens[0].TokenType == BudgetTokenEnum.NUMBER)
+            {
+                var amountToken = (NumberToken)remainingTokens[0];
+                if (remainingTokens.Count == 1)
+                {
+                    return EvaluateHelper.GetProjectionTable(Session.SessionBillList, amountToken.Value, 1);
+                }
+                else if (remainingTokens[1].TokenType == BudgetTokenEnum.NUMBER)
+                {
+                    var numMonthsToken = (NumberToken)remainingTokens[1];
+                    return EvaluateHelper.GetProjectionTable(Session.SessionBillList, amountToken.Value, (int)numMonthsToken.Value);
+                }
+                else
+                {
+                    throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
+                }
+            }
+            else if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
+            {
+                var subCommandToken = (ReservedWordToken)remainingTokens[0];
+                if (subCommandToken.ReservedWord != ReservedWordEnum.SUMMARY)
+                {
+                    throw new SubCommandNotSupportedException(ReservedWordEnum.PROJECTION, subCommandToken.ReservedWord);
+                }
+                else if (remainingTokens.Count != 2)
+                {
+                    throw new WrongNumberOfArgumentsException(remainingTokens.Count, 2);
+                }
+                else if (remainingTokens[1].TokenType == BudgetTokenEnum.NUMBER)
+                {
+                    var balanceToken = (NumberToken)remainingTokens[1];
+                    ProjectionTableData projectionData = EvaluateHelper.GetProjectionTable(Session.SessionBillList, balanceToken.Value, 3);
+                    ProjectionTableDataRow nextThirtyMinRow = projectionData.Rows.Where(x => x.Date < Session.Today.AddMonths(1)).MinBy(x => x.Balance);
+                    ProjectionTableDataRow thirtyToSixtyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(1) && x.Date < Session.Today.AddMonths(2)).MinBy(x => x.Balance);
+                    ProjectionTableDataRow sixtyToNinetyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(2) && x.Date < Session.Today.AddMonths(3)).MinBy(x => x.Balance);
+                    return new ProjectionSummary(nextThirtyMinRow, thirtyToSixtyMinRow, sixtyToNinetyMinRow);
+                }
+                else
+                {
+                    throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
+                }
+            }
+            else
+            {
+                throw new UnexpectedArgTypeException(remainingTokens[0], [BudgetTokenEnum.NUMBER, BudgetTokenEnum.RESERVED_WORD]);
+            }
         }
 
         void OnSafeExitEvent(EventArgs e)

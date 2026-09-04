@@ -28,7 +28,8 @@ namespace BudgetCLI.Scanner.Tokens
             {"weekly", ReservedWordEnum.WEEKLY},
             {"biweekly", ReservedWordEnum.BIWEEKLY},
             {"monthly", ReservedWordEnum.MONTHLY},
-            {"projection", ReservedWordEnum.PROJECTION}
+            {"projection", ReservedWordEnum.PROJECTION},
+            {"summary", ReservedWordEnum.SUMMARY}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)

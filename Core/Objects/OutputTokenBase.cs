@@ -21,6 +21,7 @@ namespace BudgetCLI.Core.Objects
         ERROR,
         SINGLE_RECURRING_BILL,
         RECURRING_BILL_LIST,
-        PROJECTION_TABLE
+        PROJECTION_TABLE,
+        PROJECTION_SUMMARY
     }
 }

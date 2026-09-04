@@ -37,6 +37,7 @@ namespace BudgetCLI.Scanner.Tokens
         WEEKLY,
         BIWEEKLY,
         MONTHLY,
-        PROJECTION
+        PROJECTION,
+        SUMMARY
     }
 }

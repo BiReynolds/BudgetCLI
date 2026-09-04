@@ -47,6 +47,9 @@ namespace BudgetCLI.Renderer
                 case OutputTokenEnum.PROJECTION_TABLE:
                     RenderProjectionTable((ProjectionTableData)outputToken);
                     break;
+                case OutputTokenEnum.PROJECTION_SUMMARY:
+                    RenderProjectionSummary((ProjectionSummary)outputToken);
+                    break;
                 default:
                     throw new OutputTokenNotSupportedException(outputToken);
             }
@@ -62,7 +65,7 @@ namespace BudgetCLI.Renderer
         public void RenderError(ErrorToken errorTextOutput)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(errorTextOutput.EncounteredException);
+            Console.WriteLine(errorTextOutput.EncounteredException.Message);
         }
 
         public void RenderSingleOneTimeBill(SingleOneTimeBillModelDetail modelDetails)
@@ -125,6 +128,17 @@ namespace BudgetCLI.Renderer
             dataTable.AddColumn("Bills Due", 50, x => string.Join(", ", x.BillsDue));
 
             dataTable.SetData(data.Rows);
+            dataTable.Render();
+        }
+
+        public void RenderProjectionSummary(ProjectionSummary summary)
+        {
+            DataTable<ProjectionTableDataRow> dataTable = new();
+            dataTable.AddColumn("Date", 12, x => x.Date.ToShortDateString(), TextAlignment.CENTER);
+            dataTable.AddColumn("Balance", 13, x => x.Balance.ToString(), TextAlignment.RIGHT);
+            dataTable.AddColumn("Bills Due", 50, x => string.Join(", ", x.BillsDue));
+
+            dataTable.SetData([summary.NextThirtyMinRow, summary.ThirtyToSixtyMinRow, summary.SixtyToNinetyMinRow]);
             dataTable.Render();
         }
 
