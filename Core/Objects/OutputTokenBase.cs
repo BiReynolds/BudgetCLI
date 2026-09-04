@@ -20,6 +20,7 @@ namespace BudgetCLI.Core.Objects
         ONE_TIME_BILL_LIST,
         ERROR,
         SINGLE_RECURRING_BILL,
-        RECURRING_BILL_LIST
+        RECURRING_BILL_LIST,
+        PROJECTION_TABLE
     }
 }

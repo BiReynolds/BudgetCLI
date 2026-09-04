@@ -56,6 +56,8 @@ namespace BudgetCLI.Evaluator
                         return EvaluateSaveCommand();
                     case ReservedWordEnum.RESET:
                         return EvaluateResetCommand();
+                    case ReservedWordEnum.PROJECTION:
+                        return EvaluateProjectionCommand(tokens[1..]);
                     default:
                         throw new CommandNotSupportedException(commandToken);
                 }
@@ -157,7 +159,7 @@ namespace BudgetCLI.Evaluator
                     case ReservedWordEnum.RECURRING:
                         RecurringBillModel deletedRecurringBill = EvaluateHelper.GetRecurringBillFromArgs(remainingTokens[1..], Session);
                         Session.DeleteRecurringBillAndUnpaidInstances(deletedRecurringBill);
-                        return new SimpleTextOutput($"recurring bill {deletedRecurringBill} deleted");
+                        return new SimpleTextOutput($"recurring bill {deletedRecurringBill.Name} deleted");
                     default:
                         throw new SubCommandNotSupportedException(ReservedWordEnum.DELETE, ReservedWordToken.ReservedWord);
                 }
@@ -193,6 +195,11 @@ namespace BudgetCLI.Evaluator
         {
             Session?.ResetSession();
             return new ResetNotification();
+        }
+
+        OutputTokenBase EvaluateProjectionCommand(List<BudgetTokenBase> remainingTokens)
+        {
+            return EvaluateHelper.GetProjectionTable(Session.SessionBillList, 1000m, 1);
         }
 
         void OnSafeExitEvent(EventArgs e)

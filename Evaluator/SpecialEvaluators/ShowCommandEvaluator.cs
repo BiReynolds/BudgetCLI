@@ -56,7 +56,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
 
         OutputTokenBase EvaluateShowBillsCommand(List<BudgetTokenBase> remainingTokens)
         {
-            IEnumerable<OneTimeBillModel> filteredBills = Session.SessionBillList;
+            IEnumerable<OneTimeBillModel> filteredBills = Session.SessionBillList.Where(x => !x.IsDeleted);
             if (remainingTokens.Count == 0)
             {
                 filteredBills = filteredBills.Where(x => !x.IsPaid);
@@ -73,7 +73,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
         {
             if (remainingTokens.Count == 0)
             {
-                return new RecurringBillList(Session.SessionRecurringBills);
+                return new RecurringBillList(Session.SessionRecurringBills.Where(x => !x.IsDeleted));
             }
             else
             {

@@ -4,6 +4,7 @@ using BudgetCLI.Exceptions;
 using BudgetCLI.Evaluator.Objects;
 using BudgetCLI.Scanner.Tokens;
 using BudgetCLI.Session;
+using BudgetCLI.Evaluator.OutputTokens;
 
 namespace BudgetCLI.Evaluator
 {
@@ -80,7 +81,7 @@ namespace BudgetCLI.Evaluator
             if (remainingTokens[0].TokenType == BudgetTokenEnum.STRING)
             {
                 string billName = ((StringToken)remainingTokens[0]).Value;
-                result = session.SessionRecurringBills.First(x => x.Name == billName);
+                result = session.SessionRecurringBills.First(x => x.Name == billName && !x.IsDeleted);
             }
             else
             {
@@ -127,6 +128,25 @@ namespace BudgetCLI.Evaluator
             {
                 throw new UnexpectedArgTypeException(remainingTokens[3], BudgetTokenEnum.RESERVED_WORD);
             }
+        }
+
+        public static ProjectionTableData GetProjectionTable(List<OneTimeBillModel> allBills, decimal startBalance, int numMonths)
+        {
+            DateOnly currentDate = DateOnly.FromDateTime(DateTime.Today);
+            IEnumerable<OneTimeBillModel> stillDueBills = allBills.Where(x => x.DueDate < currentDate);
+            IEnumerable<string> stillDueBillNames = stillDueBills.Select(x => x.Name);
+            decimal currentBalance = startBalance + stillDueBills.Sum(x => x.Amount);
+            ProjectionTableData projectionTable = new(startBalance, currentBalance, stillDueBillNames);
+            IEnumerable<OneTimeBillModel> currentBillsDue;
+            DateOnly endDate = currentDate.AddMonths(numMonths);
+            while (currentDate < endDate)
+            {
+                currentBillsDue = allBills.Where(x => x.DueDate == currentDate);
+                currentBalance += currentBillsDue.Sum(x => x.Amount);
+                projectionTable.AddRow(currentDate, currentBalance, currentBillsDue.Select(x => x.Name));
+                currentDate = currentDate.AddDays(1);
+            }
+            return projectionTable;
         }
 
         public static bool IsTrueBooleanField(ReservedWordToken testToken)

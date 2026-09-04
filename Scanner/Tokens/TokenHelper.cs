@@ -27,7 +27,8 @@ namespace BudgetCLI.Scanner.Tokens
             {"recurring", ReservedWordEnum.RECURRING},
             {"weekly", ReservedWordEnum.WEEKLY},
             {"biweekly", ReservedWordEnum.BIWEEKLY},
-            {"monthly", ReservedWordEnum.MONTHLY}
+            {"monthly", ReservedWordEnum.MONTHLY},
+            {"projection", ReservedWordEnum.PROJECTION}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)
@@ -52,7 +53,14 @@ namespace BudgetCLI.Scanner.Tokens
                 char currChar = tokenString[i];
                 if (currChar == '.')
                 {
-                    if (i != tokenString.Length - 3)
+                    if (i < tokenString.Length - 3)
+                    {
+                        return false;
+                    }
+                }
+                else if (currChar == '-')
+                {
+                    if (i != 0)
                     {
                         return false;
                     }

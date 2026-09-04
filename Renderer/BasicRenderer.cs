@@ -44,6 +44,9 @@ namespace BudgetCLI.Renderer
                 case OutputTokenEnum.RECURRING_BILL_LIST:
                     RenderRecurringBillList((RecurringBillList)outputToken);
                     break;
+                case OutputTokenEnum.PROJECTION_TABLE:
+                    RenderProjectionTable((ProjectionTableData)outputToken);
+                    break;
                 default:
                     throw new OutputTokenNotSupportedException(outputToken);
             }
@@ -87,7 +90,7 @@ namespace BudgetCLI.Renderer
             DataTable<SingleOneTimeBillModelDetail> dataTable = new();
             dataTable.AddColumn("Id", 3, x => RenderHelper.GetIdOrQuestionMark(x.Id));
             dataTable.AddColumn("Name", 15, x => x.Name);
-            dataTable.AddColumn("Amount", 10, x => x.Amount.ToString("C"), TextAlignment.RIGHT);
+            dataTable.AddColumn("Amount", 13, x => x.Amount.ToString("C"), TextAlignment.RIGHT);
             dataTable.AddColumn("Due Date", 12, x => x.DueDate.ToShortDateString(), TextAlignment.CENTER);
             dataTable.AddColumn("Paid?", 5, x => { return x.IsPaid ? "x" : ""; }, TextAlignment.CENTER);
             
@@ -100,13 +103,28 @@ namespace BudgetCLI.Renderer
             DataTable<RecurringBillDetail> dataTable = new();
             dataTable.AddColumn("Id", 3, x => RenderHelper.GetIdOrQuestionMark(x.Id));
             dataTable.AddColumn("Name", 25, x => x.Name);
-            dataTable.AddColumn("Amount", 10, x => x.Amount.ToString("C"), TextAlignment.RIGHT);
+            dataTable.AddColumn("Amount", 13, x => x.Amount.ToString("C"), TextAlignment.RIGHT);
             dataTable.AddColumn("Start Date", 12, x => x.StartDate.ToShortDateString(), TextAlignment.CENTER);
             dataTable.AddColumn("End Date", 12, x => x.EndDate?.ToShortDateString() ?? "NONE", TextAlignment.CENTER);
             dataTable.AddColumn("Recurring Type", 15, x => x.RecurringType.ToString());
             dataTable.AddColumn("Reference Date", 12, x => x.ReferenceDate.ToString(), TextAlignment.CENTER);
 
             dataTable.SetData(recurringBillList.Data);
+            dataTable.Render();
+        }
+
+        public void RenderProjectionTable(ProjectionTableData data)
+        {
+            Console.WriteLine($"Starting Balance: {data.StartBalance}");
+            Console.WriteLine($"Bills still due: {string.Join(", ", data.StillDueBills)}");
+            Console.WriteLine($"Adjusted Starting Balance: {data.AdjStartBalance}");
+
+            DataTable<ProjectionTableDataRow> dataTable = new();
+            dataTable.AddColumn("Date", 12, x => x.Date.ToShortDateString(), TextAlignment.CENTER);
+            dataTable.AddColumn("Balance", 13, x => x.Balance.ToString(), TextAlignment.RIGHT);
+            dataTable.AddColumn("Bills Due", 50, x => string.Join(", ", x.BillsDue));
+
+            dataTable.SetData(data.Rows);
             dataTable.Render();
         }
 

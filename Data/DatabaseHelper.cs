@@ -300,9 +300,10 @@ namespace BudgetCLI.Data
                 EndDate = $endDate,
                 RecurringType = $recurringType,
                 ReferenceDate = $referenceDate,
-                LastOneTimeDueDateAdded = $lastOneTimeDueDateAdded;
+                LastOneTimeDueDateAdded = $lastOneTimeDueDateAdded
+                WHERE Id = $id;
             """;
-
+            command.Parameters.AddWithValue("$id", recurringBill.Id);
             command.Parameters.AddWithValue("$name", recurringBill.Name);
             command.Parameters.AddWithValue("$amount", recurringBill.Amount);
             command.Parameters.AddWithValue("$startDate", recurringBill.StartDate);

@@ -83,12 +83,12 @@ namespace BudgetCLI.Session
         
         public OneTimeBillModel GetOneTimeBillByName(string name)
         {
-            return SessionBillList.First(x => x.Name == name);
+            return SessionBillList.First(x => x.Name == name && !x.IsDeleted);
         }
 
         public RecurringBillModel GetRecurringBillModelByName(string name)
         {
-            return SessionRecurringBills.First(x => x.Name == name);
+            return SessionRecurringBills.First(x => x.Name == name && !x.IsDeleted);
         }
 
         public void AddNewOneTimeBill(OneTimeBillModel billModel)
