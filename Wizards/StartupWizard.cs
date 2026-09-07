@@ -11,6 +11,7 @@ namespace BudgetCLI.Wizards
         {
             List<string> result = new();
             WizardHelper.AddToListIfNotEmpty(result, GetUpdateBalanceCommand());
+            WizardHelper.AddToListIfNotEmpty(result, "projection summary");
             WizardHelper.AddToListIfNotEmpty(result, GetShowBillsDueThisWeekCommand());
             return result;
         }
@@ -42,5 +43,6 @@ namespace BudgetCLI.Wizards
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
             return $"show bills duedate <= {today.AddDays(7).ToString("yyyy/MM/dd")}";
         }
+
     }
 }

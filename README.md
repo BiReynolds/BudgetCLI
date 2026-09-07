@@ -37,10 +37,10 @@
         - Shows a small table with 3 rows: "Next Month", "1 - 2 Months", and "2 - 3 Months"
         - Each row will display the date of the lowest balance in the respective range, the lowest balance value, and the bills which are coming out on the day of the lowest balance
 
+- "Startup Wizard."  
+    - On startup, program will
+    - Show a "Dashboard" featuring upcoming Projection (next week, for example) and Projection Summary based on user input amount
 ## In Progress
-- [ ] Add "Startup Wizard."  On startup, program will...
-    - Show bills which have come due since last open and allow user to mark paid or keep unpaid
-    - Show a "Dashboard" featuring upcoming Projection (next week, for example) and Projection Summary
 
 ## Upcoming
 - [ ] Edit Recurring Bill (and all one-time instances)

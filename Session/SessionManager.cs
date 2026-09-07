@@ -43,41 +43,29 @@ namespace BudgetCLI.Session
         public void SaveSession()
         {
             Connection.Open();
-            foreach (OneTimeBillModel billModel in SessionBillList)
+            IEnumerable<OneTimeBillModel> deletedBills = SessionBillList.Where(x => x.IsDeleted);
+            DatabaseHelper.DeleteManyOneTimeBills(deletedBills, Connection);
+            IEnumerable<OneTimeBillModel> newBills = SessionBillList.Where(x => !x.IsDeleted && x.Id == -1);
+            DatabaseHelper.AddManyOneTimeBillsToDatabase(newBills, Connection);
+            IEnumerable<OneTimeBillModel> changedBills = SessionBillList.Where(x => !x.IsDeleted && x.Id != -1 && x.IsChanged);
+            DatabaseHelper.UpdateManyOneTimeBills(changedBills, Connection);
+
+            IEnumerable<RecurringBillModel> deletedRecurring = SessionRecurringBills.Where(x => x.IsDeleted);
+            foreach (var recurringBillModel in deletedRecurring)
             {
-                if (billModel.Id == -1) {
-                    if (!billModel.IsDeleted)
-                    {
-                        DatabaseHelper.AddOneTimeBillToDatabase(billModel, Connection);
-                    }
-                }
-                else if (billModel.IsDeleted)
-                {
-                    DatabaseHelper.DeleteOneTimeBillById(billModel.Id, Connection);
-                }
-                else if (billModel.IsChanged)
-                {
-                    DatabaseHelper.UpdateOneTimeBill(billModel, Connection);
-                }
+                DatabaseHelper.DeleteRecurringBill(recurringBillModel, Connection);
             }
-            foreach (RecurringBillModel recurringBillModel in SessionRecurringBills)
+            IEnumerable<RecurringBillModel> newRecurring = SessionRecurringBills.Where(x => !x.IsDeleted && x.Id == null);
+            foreach (var recurringBillModel in newRecurring)
             {
-                if (recurringBillModel.Id == null)
-                {
-                    if (!recurringBillModel.IsDeleted)
-                    {
-                        DatabaseHelper.AddRecurringBillToDatabase(recurringBillModel, Connection);
-                    }
-                }
-                else if (recurringBillModel.IsDeleted)
-                {
-                    DatabaseHelper.DeleteRecurringBill(recurringBillModel, Connection);
-                }
-                else if (recurringBillModel.IsChanged)
-                {
-                    DatabaseHelper.UpdateRecurringBill(recurringBillModel, Connection);
-                }
+                DatabaseHelper.AddRecurringBillToDatabase(recurringBillModel, Connection);
             }
+            IEnumerable<RecurringBillModel> changedRecurring = SessionRecurringBills.Where(x => !x.IsDeleted && x.Id != null && x.IsChanged);
+            foreach (var recurringBillModel in changedRecurring)
+            {
+                DatabaseHelper.UpdateRecurringBill(recurringBillModel, Connection);
+            }
+
             Connection.Close();
             ResetSession();
         }

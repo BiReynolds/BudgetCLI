@@ -39,6 +39,10 @@ namespace BudgetCLI.Data
 
         public static void AddManyOneTimeBillsToDatabase(IEnumerable<OneTimeBillModel> newBills, SqliteConnection connection)
         {
+            if (!newBills.Any())
+            {
+                return;
+            }
             // Per Microsoft docs, best practice for bulk insertion is to use a transaction and reuse the same parametrized command rather than a new command for each row
             using (var transaction = connection.BeginTransaction())
             {
@@ -166,6 +170,10 @@ namespace BudgetCLI.Data
 
         public static void DeleteManyOneTimeBills(IEnumerable<OneTimeBillModel> billsToDelete, SqliteConnection connection)
         {
+            if (!billsToDelete.Any())
+            {
+                return;
+            }
             using (var transaction = connection.BeginTransaction()) {
                 SqliteCommand command = connection.CreateCommand();
                 command.CommandText = """
@@ -203,6 +211,45 @@ namespace BudgetCLI.Data
             command.Parameters.AddWithValue("$id", updatedModel.Id);
 
             command.ExecuteNonQuery();
+        }
+
+        public static void UpdateManyOneTimeBills(IEnumerable<OneTimeBillModel> updatedModels, SqliteConnection connection)
+        {
+            if (!updatedModels.Any())
+            {
+                return;
+            }
+            using (var transaction = connection.BeginTransaction())
+            {
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText = """
+                    UPDATE OneTimeBills
+                    SET 
+                    Name = $name,
+                    Amount = $amount,
+                    DueDate = $dueDate,
+                    IsPaid = $isPaid
+                    WHERE Id = $id
+                """;
+            
+                var nameParameter = CreateParameterAndAddToCommand("$name", command);
+                var amountParameter = CreateParameterAndAddToCommand("$amount", command);
+                var dueDateParameter = CreateParameterAndAddToCommand("$dueDate", command);
+                var isPaidParameter = CreateParameterAndAddToCommand("$isPaid", command);
+                var idParameter = CreateParameterAndAddToCommand("$id", command);
+
+                foreach (OneTimeBillModel bill in updatedModels)
+                {
+                    nameParameter.Value = bill.Name;
+                    amountParameter.Value = bill.Amount;
+                    dueDateParameter.Value = bill.DueDate;
+                    isPaidParameter.Value = bill.IsPaid;
+                    idParameter.Value = bill.Id;
+                    command.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
         }
 
         public static void AddRecurringBillToDatabase(RecurringBillModel model, SqliteConnection connection)
