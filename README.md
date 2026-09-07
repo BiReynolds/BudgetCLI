@@ -43,7 +43,7 @@
 ## In Progress
 
 ## Upcoming
-- [ ] Edit Recurring Bill (and all one-time instances)
+- [ ] Edit Recurring Bill (and all unpaid one-time instances)
     - [ ] Syntax: edit recurring (name) (field) (newValue)
     - [ ] Edits record in RecurringBills table
     - [ ] Will need to edit / add / remove instances of this bill from the OneTimeBills table as needed.  
