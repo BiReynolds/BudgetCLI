@@ -22,7 +22,8 @@ namespace BudgetCLI.Evaluator
         {
             {ReservedWordEnum.WEEKLY, RecurringTypeEnum.WEEKLY},
             {ReservedWordEnum.BIWEEKLY, RecurringTypeEnum.BIWEEKLY},
-            {ReservedWordEnum.MONTHLY, RecurringTypeEnum.MONTHLY}
+            {ReservedWordEnum.MONTHLY, RecurringTypeEnum.MONTHLY},
+            {ReservedWordEnum.FOUR_WEEKS, RecurringTypeEnum.FOUR_WEEKS}
         };
 
         public static OneTimeBillModel GetBillFromArgs(List<BudgetTokenBase> remainingTokens, SessionManager session)
