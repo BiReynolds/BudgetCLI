@@ -225,7 +225,6 @@ namespace BudgetCLI.Data.Models
             }
             return result;
         }
-
     }
 
     public enum RecurringTypeEnum

@@ -72,8 +72,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
                     model.DueDate = newDateToken.Value;
                     return result;
                 default:
-                    // shouldn't be possible due to EditCommandArgType check, but whatever
-                    throw new UnexpectedArgTypeException(remainingTokens[2], [BudgetTokenEnum.NUMBER, BudgetTokenEnum.STRING, BudgetTokenEnum.DATE]);
+                    throw new SubCommandNotSupportedException([ReservedWordEnum.EDIT, ReservedWordEnum.BILL], editedField.ReservedWord);
             }
         }
 
@@ -122,8 +121,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
                     result = new($"Recurring Bill {model.Name} next due date changed from {prevNextDueDate} to {nextDueDateToken.Value}");
                     return result;
                 default:
-                    // shouldn't be possible due to EditCommandArgType check, but whatever
-                    throw new UnexpectedArgTypeException(remainingTokens[2], [BudgetTokenEnum.NUMBER, BudgetTokenEnum.STRING, BudgetTokenEnum.DATE]);
+                    throw new SubCommandNotSupportedException([ReservedWordEnum.EDIT, ReservedWordEnum.RECURRING], editedField.ReservedWord);
             }
            
         }
@@ -151,7 +149,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
             IEnumerable<OneTimeBillModel> unpaidInstances = Session.SessionBillList.Where(x => x.ParentId == recurringModel.Id && !x.IsPaid);
             foreach (var instance in unpaidInstances)
             {
-                instance.Name = recurringModel.Name;
+                instance.Name = recurringModel.Name + ' ' + instance.DueDate;
             }
         }
 
@@ -172,6 +170,7 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
             foreach (var instance in unpaidInstances)
             {
                 instance.DueDate = instance.DueDate.AddDays(dayDiff);
+                instance.Name = recurringModel.Name + ' ' + instance.DueDate;
             }
             newLastDueDateAdded = unpaidInstances.Max(x => x.DueDate);
         }

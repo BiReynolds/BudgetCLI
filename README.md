@@ -29,6 +29,12 @@
     - Syntax: `add bill (name) (amount) (firstDue) (recurringType) (optional: endDate)`
 - Delete Recurring Bill (and all one-time instances)
     - Syntax: `delete recurring (name)`
+- Edit Recurring Bill (and all **unpaid** one-time instances)
+    - Syntax: `edit recurring (name) (field) (newValue)`
+    - Currently supports (field) = 'name', 'amount', 'duedate'
+        - Changing the name of a recurring bill will also change the name of the corresponding unpaid one-time bills 
+        - Changing the amount of a recurring bill also changes the amount of the corresponding unpaid one-time bills
+        - Changing the next due date of a recurring bill will find the earliest unpaid instance of the recurring bill, the amount it needs to move to get to the proposed next due date, and shifts all the corresponding unpaid one-time bills by that amound.  This method also updates the name of the instances, since the due date is part of the name
 - Projection functionality
     - Syntax: `projection (optional: numMonths)`
         - Shows a table of the next numMonths months of dates, the projected balance on each of those days, and bills coming out on each of those days
@@ -44,14 +50,14 @@
 
 ## Upcoming
 - [ ] Edit Recurring Bill (and all unpaid one-time instances)
-    - [ ] Syntax: edit recurring (name) (field) (newValue)
-    - [ ] Edits record in RecurringBills table
-    - [ ] Will need to edit / add / remove instances of this bill from the OneTimeBills table as needed.  
-        - [ ] If EndDate changes, just need to check if there are any instances after the new EndDate and remove them 
-        - [ ] If Name / Amount changes, just need to update the Name / Amount for each instance
-        - [ ] If ReferenceDate changes, need to check if instances need to be "scooted" (this allows you to move a bill from every monday to every tuesday, for example)
-        - [ ] If Recurring Type changes... may just be best to delete / re-add the instances tbh
+    - [ ] Edit End Date
 
+- Other Wizards
+    - [ ] 'Add Bill' Wizard (will cover both one time bills and recurring bills)
+    - [ ] 'Delete Bill' confirmation
+    - [ ] 'Delete Recurring' confirmation
+    - [ ] 'Edit Bill' Wizard
+    - [ ] 'Edit Recurring' Wizard
 
 ### Future 
 - Open to suggestions!
