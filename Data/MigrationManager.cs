@@ -10,7 +10,8 @@ namespace BudgetCLI.Data
         {
             {"0.1", "CreateOneTimeBillsTable.sql"},
             {"0.2", "CreateRecurringBillsTable.sql"},
-            {"0.3", "CreateBudgetJobsTable.sql"}
+            {"0.3", "CreateBudgetJobsTable.sql"},
+            {"0.3.1", "RecurringBillNameFix.sql"}
         };
         SqliteConnection Connection;
         AppInfoModel AppInfo = new();

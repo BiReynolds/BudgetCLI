@@ -140,7 +140,7 @@ namespace BudgetCLI.Data.Models
             {
                 throw new Exception("Cannot call CreateOneTimeBillInstance while Id is null - if this bill was just created, it should be written to the db and session should be reset before creating instances");
             }
-            return new(Name + dueDate.ToString("yyyy/MM/dd"), Amount, dueDate, false, (int)Id);
+            return new(Name + " " + dueDate.ToString("yyyy/MM/dd"), Amount, dueDate, false, (int)Id);
         }
 
         public List<OneTimeBillModel> GetNewBillInstances(DateOnly endDate)
