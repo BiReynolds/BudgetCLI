@@ -140,7 +140,7 @@ namespace BudgetCLI.Data.Models
             {
                 throw new Exception("Cannot call CreateOneTimeBillInstance while Id is null - if this bill was just created, it should be written to the db and session should be reset before creating instances");
             }
-            return new(Name, Amount, dueDate, false, (int)Id);
+            return new(Name + dueDate.ToString("yyyy/MM/dd"), Amount, dueDate, false, (int)Id);
         }
 
         public List<OneTimeBillModel> GetNewBillInstances(DateOnly endDate)
@@ -157,6 +157,8 @@ namespace BudgetCLI.Data.Models
                     return GetNewBiweeklyBillInstances(endDate);
                 case RecurringTypeEnum.MONTHLY:
                     return GetNewMonthlyBillInstances(endDate);
+                case RecurringTypeEnum.FOUR_WEEKS:
+                    return GetNewFourWeeksBillInstances(endDate);
                 default:
                     throw new Exception($"RecurringType {RecurringType} is not supported");
             }
@@ -192,6 +194,22 @@ namespace BudgetCLI.Data.Models
             }
             return result;
         }
+
+        List<OneTimeBillModel> GetNewFourWeeksBillInstances(DateOnly endDate)
+        {
+            DateOnly currDueDate = LastOneTimeDueDateAdded?.AddDays(28) ?? StartDate;
+            List<OneTimeBillModel> result = new();
+            while (currDueDate < endDate)
+            {
+                result.Add(CreateOneTimeBillInstance(currDueDate));
+                currDueDate = currDueDate.AddDays(28);
+            }
+            if (result.Count > 0)
+            {
+                LastOneTimeDueDateAdded = result[^1].DueDate;
+            }
+            return result;
+        }
         List<OneTimeBillModel> GetNewMonthlyBillInstances(DateOnly endDate)
         {
             DateOnly currDueDate = LastOneTimeDueDateAdded?.AddMonths(1) ?? StartDate;
@@ -214,6 +232,7 @@ namespace BudgetCLI.Data.Models
     {
         WEEKLY,
         BIWEEKLY,
+        FOUR_WEEKS,
         MONTHLY
     }
 }

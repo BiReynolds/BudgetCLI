@@ -27,6 +27,7 @@ namespace BudgetCLI.Scanner.Tokens
             {"recurring", ReservedWordEnum.RECURRING},
             {"weekly", ReservedWordEnum.WEEKLY},
             {"biweekly", ReservedWordEnum.BIWEEKLY},
+            {"fourweeks", ReservedWordEnum.FOUR_WEEKS},
             {"monthly", ReservedWordEnum.MONTHLY},
             {"projection", ReservedWordEnum.PROJECTION},
             {"summary", ReservedWordEnum.SUMMARY},
