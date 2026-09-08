@@ -8,16 +8,13 @@ namespace BudgetCLI.Renderer
 {
     public class BasicRenderer : IRenderer
     {
-        ConsoleColor DefaultResponseTextColor, DefaultInputTextColor;
-        public BasicRenderer(ConsoleColor defaultResponseTextColor = ConsoleColor.Blue, ConsoleColor defaultInputTextColor = ConsoleColor.White)
+        public BasicRenderer()
         {
-            DefaultResponseTextColor = defaultResponseTextColor;
-            DefaultInputTextColor = defaultInputTextColor;
         }
 
         public void Render(OutputTokenBase outputToken)
         {
-            SetColorsToDefaultResponse();
+            RenderHelper.SetColorsToDefaultResponse();
             switch (outputToken.OutputTokenType)
             {
                 case OutputTokenEnum.EXIT_NOTIFICATION:
@@ -53,7 +50,7 @@ namespace BudgetCLI.Renderer
                 default:
                     throw new OutputTokenNotSupportedException(outputToken);
             }
-            SetColorsToDefaultInput();
+            RenderHelper.SetColorsToDefaultInput();
         }
         
         public void RenderSimpleText(SimpleTextOutput simpleTextOutput)
@@ -65,7 +62,7 @@ namespace BudgetCLI.Renderer
         public void RenderError(ErrorToken errorTextOutput)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(errorTextOutput.EncounteredException.Message);
+            Console.WriteLine(errorTextOutput.EncounteredException);
         }
 
         public void RenderSingleOneTimeBill(SingleOneTimeBillModelDetail modelDetails)
@@ -167,14 +164,5 @@ namespace BudgetCLI.Renderer
         }
 
 
-        void SetColorsToDefaultResponse()
-        {
-            Console.ForegroundColor = DefaultResponseTextColor;
-        }
-
-        void SetColorsToDefaultInput()
-        {
-            Console.ForegroundColor = DefaultInputTextColor;
-        }
     }
 }

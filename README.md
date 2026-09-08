@@ -49,8 +49,6 @@
     - Show a "Dashboard" featuring upcoming Projection (next week, for example) and Projection Summary based on user input amount
 
 ## In Progress
-- [ ] Edit Recurring Bill (and all unpaid one-time instances)
-
 - Other Wizards
     - [ ] 'Add Bill' Wizard (will cover both one time bills and recurring bills)
     - [ ] 'Delete Bill' confirmation

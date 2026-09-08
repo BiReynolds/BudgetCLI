@@ -232,6 +232,7 @@ namespace BudgetCLI.Data.Models
         WEEKLY,
         BIWEEKLY,
         FOUR_WEEKS,
-        MONTHLY
+        MONTHLY,
+        NOT_RECURRING
     }
 }

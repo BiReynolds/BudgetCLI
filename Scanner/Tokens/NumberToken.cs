@@ -4,6 +4,7 @@ namespace BudgetCLI.Scanner.Tokens
 {
     public class NumberToken : BudgetTokenBase
     {
+        public static readonly NumberToken Zero = new("0", 0);
         public decimal Value { get; set; }
         public NumberToken(string rawToken, decimal value) : base(rawToken, BudgetTokenEnum.NUMBER)
         {

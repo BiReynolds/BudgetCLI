@@ -49,10 +49,10 @@ namespace BudgetCLI.Core
 
         public void HandleUserInput()
         {
-            HandleInput(CurrentInput);
+            HandleStringInput(CurrentInput);
         }
 
-        void HandleInput(string stringInput)
+        void HandleStringInput(string stringInput)
         {
             try
             {
@@ -60,6 +60,21 @@ namespace BudgetCLI.Core
                 CurrentOutput = Evaluator.Evaluate(CurrentScannedTokens);
             }
             catch (Exception e)
+            {
+                CurrentOutput = new ErrorToken(e);
+            }
+            Renderer.Render(CurrentOutput);
+        }
+
+        void HandleTokenInput(List<BudgetTokenBase> tokens)
+        {
+            CurrentInput = "";
+            CurrentScannedTokens = tokens;
+            try
+            {
+                CurrentOutput = Evaluator.Evaluate(CurrentScannedTokens);
+            }
+            catch (Exception e) 
             {
                 CurrentOutput = new ErrorToken(e);
             }
@@ -85,8 +100,11 @@ namespace BudgetCLI.Core
                 Running = false;
             };
 
-            List<string> startupCommands = StartupWizard.GetCommandsFromWizard();
-            startupCommands.ForEach(x => HandleInput(x));
+            List<List<BudgetTokenBase>> startupCommands = StartupWizard.GetCommandsFromWizard();
+            foreach (var commandTokens in startupCommands)
+            {
+                HandleTokenInput(commandTokens);
+            }
             Console.WriteLine("Budget program started");
         }
 

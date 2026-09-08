@@ -6,6 +6,7 @@ using BudgetCLI.Exceptions;
 using BudgetCLI.Data.Models;
 using BudgetCLI.Session;
 using BudgetCLI.Evaluator.SpecialEvaluators;
+using BudgetCLI.Wizards;
 
 namespace BudgetCLI.Evaluator 
 {
@@ -95,30 +96,46 @@ namespace BudgetCLI.Evaluator
 
         OutputTokenBase EvaluateAddCommand(List<BudgetTokenBase> remainingTokens)
         {
-            if (remainingTokens.Count < 4 || remainingTokens.Count > 6)
+            int[] validNumCommands = [1, 4, 5, 6];
+            if (!validNumCommands.Contains(remainingTokens.Count))
             {
-                throw new WrongNumberOfArgumentsException(remainingTokens.Count, [4, 5, 6]);
+                throw new WrongNumberOfArgumentsException(remainingTokens.Count, validNumCommands);
             }
-            if (remainingTokens[1].TokenType != BudgetTokenEnum.STRING)
+            if (remainingTokens.Count != 1)
             {
-                throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
+                if (remainingTokens[1].TokenType != BudgetTokenEnum.STRING)
+                {
+                    throw new UnexpectedArgTypeException(remainingTokens[0], BudgetTokenEnum.STRING);
+                }
+                if (remainingTokens[2].TokenType != BudgetTokenEnum.NUMBER)
+                {
+                    throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
+                }
+                if (remainingTokens[3].TokenType != BudgetTokenEnum.DATE)
+                {
+                    throw new UnexpectedArgTypeException(remainingTokens[2], BudgetTokenEnum.DATE);
+                }
             }
-            if (remainingTokens[2].TokenType != BudgetTokenEnum.NUMBER)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[1], BudgetTokenEnum.NUMBER);
-            }
-            if (remainingTokens[3].TokenType != BudgetTokenEnum.DATE)
-            {
-                throw new UnexpectedArgTypeException(remainingTokens[2], BudgetTokenEnum.DATE);
-            }
-
             if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
                 ReservedWordToken ReservedWordToken = (ReservedWordToken)remainingTokens[0];
                 switch (ReservedWordToken.ReservedWord)
                 {
                     case ReservedWordEnum.BILL:
-                        if (remainingTokens.Count == 4)
+                        if (remainingTokens.Count == 1)
+                        {
+                            AddBillWizard wizard = new();
+                            List<List<BudgetTokenBase>> addBillWizardCommands = wizard.GetCommandsFromWizard();
+                            if (addBillWizardCommands.Count == 0)
+                            {
+                                return new SimpleTextOutput("Add Bill Wizard was cancelled");
+                            }
+                            else
+                            {
+                                return Evaluate(addBillWizardCommands[0]);
+                            }
+                        }
+                        else if (remainingTokens.Count == 4)
                         {
                             OneTimeBillModel billModel = EvaluateHelper.CreateBillFromArgs(remainingTokens[1..]);
                             Session.AddNewOneTimeBill(billModel);

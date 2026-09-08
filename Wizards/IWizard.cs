@@ -1,8 +1,9 @@
+using BudgetCLI.Core.Objects;
+
 namespace BudgetCLI.Wizards
 {
     public interface IWizard
     {
-        public List<string> GetCommandsFromWizard();
-
+        public List<List<BudgetTokenBase>> GetCommandsFromWizard();
     }
 }
