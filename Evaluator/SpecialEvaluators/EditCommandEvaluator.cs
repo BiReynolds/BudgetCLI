@@ -120,6 +120,14 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
                     model.LastOneTimeDueDateAdded = newLastDueDateAdded;
                     result = new($"Recurring Bill {model.Name} next due date changed from {prevNextDueDate} to {nextDueDateToken.Value}");
                     return result;
+                case ReservedWordEnum.END_DATE:
+                    DateToken endDateToken = (DateToken)remainingTokens[2];
+                    DateOnly? oldEndDate = model.EndDate;
+                    model.EndDate = endDateToken.Value;
+                    ApplyEndDateToInstances(model, oldEndDate, out DateOnly newLastInstanceAddedDate);
+                    model.LastOneTimeDueDateAdded = newLastInstanceAddedDate;
+                    result = new($"Recurring Bill {model.Name} end date changed from {oldEndDate} to {model.EndDate}");
+                    return result;
                 default:
                     throw new SubCommandNotSupportedException([ReservedWordEnum.EDIT, ReservedWordEnum.RECURRING], editedField.ReservedWord);
             }
@@ -173,6 +181,27 @@ namespace BudgetCLI.Evaluator.SpecialEvaluators
                 instance.Name = recurringModel.Name + ' ' + instance.DueDate;
             }
             newLastDueDateAdded = unpaidInstances.Max(x => x.DueDate);
+        }
+
+        void ApplyEndDateToInstances(RecurringBillModel recurringModel, DateOnly? oldEndDate, out DateOnly newLastInstanceAddedDate)
+        {
+            if (recurringModel.EndDate < oldEndDate)
+            {
+                IEnumerable<OneTimeBillModel> unpaidInstances = Session.SessionBillList.Where(x => x.ParentId == recurringModel.Id && !x.IsPaid);
+                foreach (var instance in unpaidInstances)
+                {
+                    if (instance.DueDate > recurringModel.EndDate)
+                    {
+                        instance.IsDeleted = true;
+                    }
+                }
+            }
+            else
+            {
+                IEnumerable<OneTimeBillModel> newInstances = recurringModel.GetNewBillInstances(Session.Today.AddMonths(12));
+                Session.SessionBillList.AddRange(newInstances);
+            }
+            newLastInstanceAddedDate = Session.SessionBillList.Where(x => !x.IsDeleted).Max(x => x.DueDate);
         }
     }
 }

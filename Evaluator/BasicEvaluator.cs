@@ -25,9 +25,9 @@ namespace BudgetCLI.Evaluator
 
         public OutputTokenBase Evaluate(List<BudgetTokenBase> tokens)
         {
-            if (Session == null)
+            if (Session == null || ShowCommandEvaluator == null || EditCommandEvaluator == null)
             {
-                throw new Exception("Session data is null at Evaluate - did you call SetSessionData?");
+                throw new Exception("Evaluator data is null at Evaluate - did you call SetSessionData?");
             }
             BudgetTokenBase firstToken = tokens[0];
             if (firstToken.TokenType == BudgetTokenEnum.STRING)
@@ -114,7 +114,7 @@ namespace BudgetCLI.Evaluator
 
             if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
-                ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
+                ReservedWordToken ReservedWordToken = (ReservedWordToken)remainingTokens[0];
                 switch (ReservedWordToken.ReservedWord)
                 {
                     case ReservedWordEnum.BILL:
@@ -149,7 +149,7 @@ namespace BudgetCLI.Evaluator
         {
             if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
-                ReservedWordToken ReservedWordToken = remainingTokens[0] as ReservedWordToken;
+                ReservedWordToken ReservedWordToken = (ReservedWordToken)remainingTokens[0];
                 switch (ReservedWordToken.ReservedWord)
                 {
                     case ReservedWordEnum.BILL:
@@ -222,9 +222,13 @@ namespace BudgetCLI.Evaluator
                 else 
                 {
                     ProjectionTableData projectionData = EvaluateHelper.GetProjectionTable(Session.SessionBillList, Session.SessionBalance, 3);
-                    ProjectionTableDataRow nextThirtyMinRow = projectionData.Rows.Where(x => x.Date < Session.Today.AddMonths(1)).MinBy(x => x.Balance);
-                    ProjectionTableDataRow thirtyToSixtyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(1) && x.Date < Session.Today.AddMonths(2)).MinBy(x => x.Balance);
-                    ProjectionTableDataRow sixtyToNinetyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(2) && x.Date < Session.Today.AddMonths(3)).MinBy(x => x.Balance);
+                    ProjectionTableDataRow? nextThirtyMinRow = projectionData.Rows.Where(x => x.Date < Session.Today.AddMonths(1)).MinBy(x => x.Balance);
+                    ProjectionTableDataRow? thirtyToSixtyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(1) && x.Date < Session.Today.AddMonths(2)).MinBy(x => x.Balance);
+                    ProjectionTableDataRow? sixtyToNinetyMinRow = projectionData.Rows.Where(x => x.Date >= Session.Today.AddMonths(2) && x.Date < Session.Today.AddMonths(3)).MinBy(x => x.Balance);
+                    if (nextThirtyMinRow == null || thirtyToSixtyMinRow == null || sixtyToNinetyMinRow == null)
+                    {
+                        throw new Exception("problem finding one or more rows for projection summary...");
+                    }
                     return new ProjectionSummary(nextThirtyMinRow, thirtyToSixtyMinRow, sixtyToNinetyMinRow);
                 }
             }

@@ -31,10 +31,11 @@
     - Syntax: `delete recurring (name)`
 - Edit Recurring Bill (and all **unpaid** one-time instances)
     - Syntax: `edit recurring (name) (field) (newValue)`
-    - Currently supports (field) = 'name', 'amount', 'duedate'
+    - Currently supports (field) = 'name', 'amount', 'duedate', 'enddate'
         - Changing the name of a recurring bill will also change the name of the corresponding unpaid one-time bills 
         - Changing the amount of a recurring bill also changes the amount of the corresponding unpaid one-time bills
         - Changing the next due date of a recurring bill will find the earliest unpaid instance of the recurring bill, the amount it needs to move to get to the proposed next due date, and shifts all the corresponding unpaid one-time bills by that amound.  This method also updates the name of the instances, since the due date is part of the name
+        - Changing the end date of a recurring bill will also delete any instances which exist after the new end date, add new instances which need to be added (within the 12 month lookahead period), and update the LastOneTimeDueDateAdded field for the recurring bill accordingly
 - Projection functionality
     - Syntax: `projection (optional: numMonths)`
         - Shows a table of the next numMonths months of dates, the projected balance on each of those days, and bills coming out on each of those days
@@ -46,11 +47,9 @@
 - "Startup Wizard."  
     - On startup, program will
     - Show a "Dashboard" featuring upcoming Projection (next week, for example) and Projection Summary based on user input amount
-## In Progress
 
-## Upcoming
+## In Progress
 - [ ] Edit Recurring Bill (and all unpaid one-time instances)
-    - [ ] Edit End Date
 
 - Other Wizards
     - [ ] 'Add Bill' Wizard (will cover both one time bills and recurring bills)
@@ -58,6 +57,11 @@
     - [ ] 'Delete Recurring' confirmation
     - [ ] 'Edit Bill' Wizard
     - [ ] 'Edit Recurring' Wizard
+
+## Upcoming
+- [ ] Help functionality
+    - [ ] `help` command
+    - [ ] `help (reserved word)` commands
 
 ### Future 
 - Open to suggestions!

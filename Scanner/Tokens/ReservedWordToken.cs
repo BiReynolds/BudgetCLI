@@ -41,6 +41,7 @@ namespace BudgetCLI.Scanner.Tokens
         PROJECTION,
         SUMMARY,
         BALANCE,
-        NEXT_DUE
+        NEXT_DUE,
+        END_DATE
     }
 }

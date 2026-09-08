@@ -16,14 +16,13 @@ namespace BudgetCLI.Jobs.JobInstances
 
         public void RunJob(SessionManager session)
         {
-            DateOnly endDate = DateOnly.FromDateTime(DateTime.Today).AddMonths(NumMonthsLookahead);
+            DateOnly endDate = session.Today.AddMonths(NumMonthsLookahead);
             foreach (RecurringBillModel recurringBill in session.SessionRecurringBills)
             {
                 List<OneTimeBillModel> newInstances = recurringBill.GetNewBillInstances(endDate);
                 session.AddManyOneTimeBills(newInstances);
             }
             session.SaveSession();
-            session.ResetSession();
         }
     }
 }
