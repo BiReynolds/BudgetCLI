@@ -232,11 +232,7 @@ namespace BudgetCLI.Evaluator
             else if (remainingTokens[0].TokenType == BudgetTokenEnum.RESERVED_WORD)
             {
                 var subCommandToken = (ReservedWordToken)remainingTokens[0];
-                if (subCommandToken.ReservedWord != ReservedWordEnum.SUMMARY)
-                {
-                    throw new SubCommandNotSupportedException(ReservedWordEnum.PROJECTION, subCommandToken.ReservedWord);
-                }
-                else 
+                if (subCommandToken.ReservedWord == ReservedWordEnum.SUMMARY)
                 {
                     ProjectionTableData projectionData = EvaluateHelper.GetProjectionTable(Session.SessionBillList, Session.SessionBalance, 3);
                     ProjectionTableDataRow? nextThirtyMinRow = projectionData.Rows.Where(x => x.Date < Session.Today.AddMonths(1)).MinBy(x => x.Balance);
@@ -247,6 +243,24 @@ namespace BudgetCLI.Evaluator
                         throw new Exception("problem finding one or more rows for projection summary...");
                     }
                     return new ProjectionSummary(nextThirtyMinRow, thirtyToSixtyMinRow, sixtyToNinetyMinRow);
+                }
+                else if (subCommandToken.ReservedWord == ReservedWordEnum.ALLOWANCE)
+                {
+                    ProjectionTableData projectionData = EvaluateHelper.GetProjectionTable(Session.SessionBillList, Session.SessionBalance, 4);
+                    decimal? currAllowance = null;
+                    for (int i = 0; i < projectionData.Rows.Count; i++)
+                    {
+                        decimal testAllowance = projectionData.Rows[i].Balance/(i + 1);
+                        if (currAllowance == null || testAllowance < currAllowance)
+                        {
+                            currAllowance = testAllowance;
+                        }
+                    }
+                    return new SimpleTextOutput(currAllowance?.ToString("C") ?? 0.ToString("C"));
+                }
+                else
+                {
+                    throw new SubCommandNotSupportedException(ReservedWordEnum.PROJECTION, subCommandToken.ReservedWord);
                 }
             }
             else

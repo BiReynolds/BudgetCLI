@@ -58,7 +58,8 @@ namespace BudgetCLI.Wizards
                 new ReservedWordToken("bills", ReservedWordEnum.BILLS),
                 new ReservedWordToken("duedate", ReservedWordEnum.DUE_DATE),
                 new ReservedWordToken("<=", ReservedWordEnum.LESS_OR_EQUAL),
-                DateToken.Today
+                DateToken.Today,
+                new ReservedWordToken("unpaid", ReservedWordEnum.UNPAID)
             ];
         }
 

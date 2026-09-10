@@ -33,7 +33,8 @@ namespace BudgetCLI.Scanner.Tokens
             {"summary", ReservedWordEnum.SUMMARY},
             {"balance", ReservedWordEnum.BALANCE},
             {"nextdue", ReservedWordEnum.NEXT_DUE},
-            {"enddate", ReservedWordEnum.END_DATE}
+            {"enddate", ReservedWordEnum.END_DATE},
+            {"allowance", ReservedWordEnum.ALLOWANCE}
         };
 
         public static bool TryGetNumberToken(string tokenString, out NumberToken? result)

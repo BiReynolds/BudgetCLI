@@ -49,6 +49,7 @@ namespace BudgetCLI.Scanner.Tokens
         BALANCE,
         NEXT_DUE,
         END_DATE,
-        INVALID
+        INVALID,
+        ALLOWANCE
     }
 }
