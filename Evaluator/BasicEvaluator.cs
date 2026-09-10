@@ -256,7 +256,8 @@ namespace BudgetCLI.Evaluator
                             currAllowance = testAllowance;
                         }
                     }
-                    return new SimpleTextOutput(currAllowance?.ToString("C") ?? 0.ToString("C"));
+                    decimal weeklyAllowance = 7 * (decimal)currAllowance;
+                    return new SimpleTextOutput($"Weekly Allowance: {weeklyAllowance.ToString("C")}");
                 }
                 else
                 {
